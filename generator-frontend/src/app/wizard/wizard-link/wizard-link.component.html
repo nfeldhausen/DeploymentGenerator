@@ -1,0 +1,105 @@
+<div class="row mb-1">
+    <div class="col">
+        <a data-toggle="collapse" data-target=".linkCollapse">
+            <div class="card border-dark">
+                <div class="linkCollapse collapse">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle my-auto mr-1"></i> Link Information
+                    </div>
+                </div>
+                <div class="linkCollapse collapse show">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-auto my-auto">
+                                <i class="fas fa-info-circle fa-3x my-auto"></i>
+                            </div>
+                            <div class="col">
+                                <p class="card-text text-justify">One or multiple containers may have to communicate with each other. Here you can define links between containers (e.g. for the communication with other containers) in form of environment variables. By default this creates
+                                    a environment variable in form $LinkName=toContainerName in the fromContainer. If you need a custom environment variable (for example a link with the port) you can set the link scheme field. Just write what you want
+                                    and if you want to access the toContainer insert the keyword &lt;link&gt; (e.g. http://&lt;link&gt;:8080)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+<div class="row mb-1">
+    <div class="col">
+        <p class="m-0 text-justify"><b>To create a link add an empty link, insert the name of the environment
+                variable for the
+                communication, and select where the link should be created (fromContainer) and
+                where
+                the link should go
+                to
+                (toContainer).</b></p>
+    </div>
+</div>
+<div class="row mb-2">
+    <div class="col">
+        <button type="button" class="btn btn-primary btn-block" (click)="addLink()">Add Link</button>
+    </div>
+</div>
+
+<!--Actual Links-->
+<form #linkForm="ngForm" (ngSubmit)="submitted = true; linkForm.valid && getNextPage()">
+    <div class="form-row mb-2" *ngFor="let link of request.links" [@fastEnterAnimation]>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Name*</span>
+                </div>
+                <input type="text" class="form-control" placeholder="Variable Name" [(ngModel)]="link.name" name="{{link.uniqueName}}-name" required #name="ngModel" [ngClass]="{'is-invalid': submitted && name.invalid}">
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Scheme</span>
+                </div>
+                <input type="text" class="form-control" placeholder="&lt;link&gt;" [(ngModel)]="link.scheme" name="{{link.uniqueName}}-scheme" #scheme="ngModel" [ngClass]="{'is-invalid': submitted && scheme.invalid}">
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">containerFrom</span>
+                </div>
+                <select class="custom-select" [(ngModel)]="link.containerFrom" name="{{link.uniqueName}}-containerFrom" required #containerFrom="ngModel" [ngClass]="{'is-invalid': submitted && containerFrom.invalid}">
+                    <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                        {{container.name}}</option>
+                </select>
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">containerTo</span>
+                </div>
+                <select class="custom-select" [(ngModel)]="link.containerTo" name="{{link.uniqueName}}-containerTo" required #containerTo="ngModel" [ngClass]="{'is-invalid': submitted && containerTo.invalid}">
+                    <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                        {{container.name}}</option>
+                </select>
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-secondary" (click)="deleteLink(link)"><i class="fas fa-trash-alt"
+                    title="Delete"></i></button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <button type="submit" class="btn btn-primary btn-block">Continue</button>
+        </div>
+    </div>
+</form>

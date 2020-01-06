@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress-phpmyadmin
+  labels:
+    app: wordpress
+    stage: control
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+      stage: control
+  template:
+    metadata:
+      labels:
+        app: wordpress
+        stage: control
+    spec:
+      containers:
+      - name: phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        ports:
+        - name: http 
+          containerPort: 80
+        env:
+        - name: PMA_HOST
+          value: wordpress-mysql-service
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+          httpGet:
+            path: "/"
+            port: 80
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+          httpGet:
+            path: "/"
+            port: 80
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 100m
+            memory: 150Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-phpmyadmin-service
+  labels:
+    app: wordpress
+    stage: control
+spec:
+  selector:
+    app: wordpress
+    stage: control
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http

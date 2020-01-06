@@ -1,0 +1,88 @@
+<div class="row mb-2">
+    <div class="col">
+        <button type="button" class="btn btn-primary" (click)="addDatabase()"><i class="fas fa-plus"></i> Add
+            Database</button>
+    </div>
+</div>
+<div class="row p-2 border border-dark mb-2" *ngFor="let database of request.databases" [@enterAnimation]>
+    <div class="col">
+        <div class="row mb-2">
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-6 my-auto">
+                        <h2 class="font-weight-bold text-truncate my-auto">{{database.name}} Database</h2>
+                    </div>
+                    <div class="col-6 my-auto text-muted">
+                        <small class="my-auto">ID: {{database.uniqueName}}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <button type="button" (click)="deleteDatabase(database)" class="btn btn-danger float-right"><i
+                        class="fas fa-trash-alt"></i> Delete
+                    Database</button>
+            </div>
+        </div>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Name*</span>
+            </div>
+            <input type="text" class="form-control" pattern="([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]" [(ngModel)]="database.name" name="{{database.uniqueName + '-name'}}" #dbname="ngModel" [ngClass]="{'is-invalid': submitted && dbname.invalid}" required>
+            <div class="invalid-feedback">
+                Database name can not be empty
+            </div>
+        </div>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Image*</span>
+            </div>
+            <select class="custom-select" [(ngModel)]="database.image" name="{{database.uniqueName + '-image'}}" #dbimage="ngModel" (ngModelChange)="setEnvironmentsForDatabase(database)" [ngClass]="{'is-invalid': submitted && dbimage.invalid}" required>
+                <option *ngFor="let dbconfig of availableDatabases" [ngValue]="dbconfig.name">{{dbconfig.name}}</option>
+            </select>
+            <div class="invalid-feedback">
+                Database image can not be empty
+            </div>
+        </div>
+        <div class="input-group mb-2">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Size*</span>
+            </div>
+            <input type="number" class="form-control" [(ngModel)]="database.size" placeholder="Size in Mb" name="{{database.uniqueName + '-size'}}" #dbsize="ngModel" [ngClass]="{'is-invalid': submitted && dbsize.invalid}" required min="1" customMin="1" />
+            <div class="invalid-feedback">
+                Database size must be a number higher than 1
+            </div>
+        </div>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="{{database.uniqueName + '-expose'}}" name="{{database.uniqueName + '-expose'}}" [(ngModel)]=database.expose>
+            <label class="custom-control-label" for="{{database.uniqueName + '-expose'}}">Expose Database
+                externally</label>
+        </div>
+        <div *ngIf="database.expose" [@enterAnimation]>
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Service Type*</span>
+                </div>
+                <select class="custom-select" [(ngModel)]="database.type" name="{{database.uniqueName + '-type'}}" #dbptype="ngModel" [ngClass]="{'is-invalid': submitted && dbptype.invalid}" required>
+                    <option>LoadBalancer</option>
+                    <option>NodePort</option>
+                </select>
+                <div class="invalid-feedback">
+                    Database service type must be LoadBalancer or NodePort
+                </div>
+            </div>
+        </div>
+        <div *ngIf="database.environments.length" [@enterAnimation]>
+            <div class="row mb-2">
+                <div class="col my-auto">
+                    <h3 class="my-auto">Environment Variables</h3>
+                </div>
+            </div>
+            <div class="input-group mb-2" *ngFor="let variable of database.environments" [@enterAnimation]>
+                <div class="input-group-prepend">
+                    <span class="input-group-text">{{variable.name}}</span>
+                </div>
+                <input type="text" class="form-control" [(ngModel)]="variable.value" placeholder="Set or leave empty" name="{{database.uniqueName + '-' + variable.name}}" />
+            </div>
+        </div>
+    </div>
+</div>

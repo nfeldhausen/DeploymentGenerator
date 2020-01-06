@@ -1,0 +1,82 @@
+configuration:
+  databases:
+    - name: mysql
+      image: mysql:5
+      port: 3306
+      mustSetVariables:
+        - MYSQL_ROOT_PASSWORD
+      mountPath: /var/lib/mysql
+      environmentVariables:
+        - name: MYSQL_ROOT_PASSWORD
+          secret: true
+        - name: MYSQL_DATABASE
+        - name: MYSQL_USER
+          secret: true
+        - name: MYSQL_PASSWORD
+          secret: true
+    - name: mariadb
+      image: mariadb:10
+      port: 3306
+      mustSetVariables:
+        - MYSQL_ROOT_PASSWORD
+      mountPath: /var/lib/mysql
+      environmentVariables:
+        - name: MYSQL_ROOT_PASSWORD
+          secret: true
+        - name: MYSQL_DATABASE
+        - name: MYSQL_USER
+          secret: true
+        - name: MYSQL_PASSWORD
+          secret: true
+    - name: redis
+      image: redis:5
+      port: 6379
+      mountPath: /data
+    - name: postgres
+      image: postgres:12
+      port: 5432
+      mustSetVariables:
+        - POSTGRES_PASSWORD
+      environmentVariables:
+        - name: POSTGRES_PASSWORD
+          secret: true
+        - name: POSTGRES_USER
+          secret: true
+        - name: POSTGRES_DB
+      mountPath: /var/lib/postgresql/data
+    - name: mongodb
+      image: mongo:3.4
+      port: 27017
+      mustSetVariables:
+        - MONGO_INITDB_ROOT_PASSWORD
+        - MONGO_INITDB_ROOT_USERNAME
+      mountPath: /etc/mongo
+      environmentVariables:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          secret: true
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          secret: true
+        - name: MONGO_INITDB_DATABASE
+    - name: couchdb
+      image: couchdb:2
+      port: 5984
+      mustSetVariables:
+        - COUCHDB_PASSWORD
+        - COUCHDB_USER
+      mountPath: /opt/couchdb/data
+      environmentVariables:
+        - name: COUCHDB_USER
+          secret: true
+        - name: COUCHDB_PASSWORD
+          secret: true
+docker:
+  host: ${DOCKER_HOST:unix:///var/run/docker.sock}
+
+logging:
+  level:
+    com:
+      github:
+        dockerjava:
+          core:
+            async:
+              ResultCallbackTemplate: off

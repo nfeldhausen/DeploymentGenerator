@@ -1,0 +1,101 @@
+---
+apiVersion: "apps/v1"
+kind: "StatefulSet"
+metadata:
+  name: "wordpress-mysql"
+  labels:
+    app: "wordpress"
+    stage: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "wordpress"
+      stage: "backend"
+  serviceName: "wordpress-mysql-service"
+  template:
+    metadata:
+      labels:
+        app: "wordpress"
+        stage: "backend"
+    spec:
+      containers:
+      - image: "mysql:5.6"
+        name: "mysql"
+        ports:
+        - containerPort: 3306
+          name: "mysql"
+          protocol: "TCP"
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: "mysql-data"
+        envFrom:
+        - secretRef:
+            name: wordpress-mysql-secret
+        resources:
+          requests:
+            cpu: 0.1
+            memory: 512Mi
+          limits:
+            cpu: 0.5
+            memory: 1Gi
+        readinessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 1
+          tcpSocket:
+            port: 3306
+        livenessProbe:
+          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+          tcpSocket:
+            port: 3306
+  volumeClaimTemplates:
+  - apiVersion: "v1"
+    kind: "PersistentVolumeClaim"
+    metadata:
+      name: "mysql-data"
+      labels:
+        app: "wordpress"
+        stage: "backend"
+    spec:
+      accessModes:
+      - "ReadWriteOnce"
+      resources:
+        requests:
+          storage: "10Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wordpress-mysql-service
+  labels:
+    app: wordpress
+    stage: backend
+spec:
+  type: ClusterIP
+  selector:
+    app: wordpress
+    stage: backend
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-mysql-secret
+  labels:
+    app: wordpress
+type: Opaque
+data:
+  MYSQL_USER: Y2hhbmdlbWU=
+  MYSQL_ROOT_PASSWORD: Y2hhbmdlbWU=
+  MYSQL_PASSWORD: Y2hhbmdlbWU=
+  MYSQL_DATABASE: Y2hhbmdlbWU=

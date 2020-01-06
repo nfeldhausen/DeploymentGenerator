@@ -1,0 +1,96 @@
+<div class="row">
+    <div class="col">
+        <div class="row mb-2">
+            <div class="col">
+                <a routerLink="/advanced" class="btn btn-primary btn-block" [state]="{request: request, description: description}"><i
+                    class="fas fa-arrow-circle-left"></i> Back to Advanced mode</a>
+            </div>
+        </div>
+        <div class="form-row border rounded border-dark mb-2 justify-content-end justify-content-start">
+            <div class="col">
+                <div class="row mb-2">
+                    <div class="col">
+                        <p class="m-1 text-justify">You can deploy or delete this YAML Deployment File by providing the master address and an admin token for your Kubernetes cluster</p>
+                    </div>
+                </div>
+                <div class="row" *ngIf="deployAlertMessage" [@fastEnterAnimation]>
+                    <div class="col">
+                        <ngb-alert type="{{deployAlertType}}" [dismissible]="false" [innerHTML]="deployAlertMessage"></ngb-alert>
+                    </div>
+                </div>
+                <form #deployForm="ngForm" (ngSubmit)="deployForm.valid && deployOrDeleteForm()">
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Master Address*</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Master Address" name="deployAddress" [(ngModel)]="deployAddress" required #depAddress="ngModel" [ngClass]="{'is-invalid': deployForm.submitted && depAddress.invalid}">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Token*</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Token" name="deployToken" [(ngModel)]="deployToken" required #depToken="ngModel" [ngClass]="{'is-invalid': deployForm.submitted && depToken.invalid}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <button type="submit" class="btn btn-block btn-primary" (click)="deployType = 'DEPLOY'">Deploy</button>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-block btn-secondary" (click)="deployType = 'ENDPOINTS'">Get Service Endpoints</button>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-block btn-danger" (click)="deployType = 'DELETE'">Delete</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="row mb-2" *ngIf="deployEndpoints && deployEndpoints.size" [@enterAnimation]>
+                    <div class="col">
+                        <div class="card border-dark">
+                            <a data-toggle="collapse" data-target="#collapseService">
+                                <div class="card-header">
+                                    Externally accessible service endpoints
+                                </div>
+                            </a>
+                            <div class="collapse show" id="collapseService">
+                                <div class="card-body">
+                                    <table class="table table-bordered m-0">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" style="width: 1%; white-space: nowrap;">Service Name</th>
+                                                <th scope="col" style="text-align: center;">Service Endpoints</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let key of getEndpointKeys()">
+                                                <th scope="row" class="align-middle">{{key}}</th>
+                                                <td style="text-align: center;" class="align-middle" [innerHTML]="getEndpointValueString(key)"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-row border rounded border-dark mb-2 justify-content-end justify-content-start">
+            <div class="col-10">
+                <pre class="font-weight-bold">{{deployment}}</pre>
+            </div>
+            <div class="col-2 mb-2">
+                <div class="btn-group float-right mt-2">
+                    <button type="button" class="btn btn-secondary" ngbTooltip="Copied!" triggers="manual" #t="ngbTooltip" (click)="t.open(); copyMessage()"><i class="fas fa-copy" title="Copy"></i></button>
+                    <button type="button" class="btn btn-secondary" (click)="download()"><i
+                            class="fas fa-download" title="Download"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,78 @@
+<div *ngIf="mainWizardOptions.page === 'START'">
+    <form #mainForm="ngForm">
+        <div class="row mb-1">
+            <div class="col">
+                <a data-toggle="collapse" data-target=".welcomeCollapse">
+                    <div class="card border-dark">
+                        <div class="welcomeCollapse collapse">
+                            <div class="card-header">
+                                <i class="fas fa-info-circle my-auto mr-1"></i>Welcome Information
+                            </div>
+                        </div>
+                        <div class="welcomeCollapse collapse show">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-auto my-auto">
+                                        <i class="fas fa-info-circle fa-3x my-auto"></i>
+                                    </div>
+                                    <div class="col">
+                                        <p class="card-text text-justify">This wizard tries to help to deploy single containers or even microservice architectures on Kubernetes. The wizard uses some questions of the <b>Twelve-Factor App methodology</b> to determine the needs of the users
+                                            application. At the end the wizard presents the user a deployable YAML file for Kubernets. During the wizard there exist no way to go back, but you can change settings at the summary at the end. If you require
+                                            more information you can always click the info boxes for more information. All fields and questions you will see are mandatory and must be filled or answered. You should choose all names uniquely!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col">
+                <p class="m-0 text-justify"><b>Does your workload consist of more than one container, which have to
+                            communicate with each
+                            other? </b> (If your workload consist of more than one container it is probably designed as a microservice architecture)
+                </p>
+            </div>
+        </div>
+        <div class="row pl-3 mb-2">
+            <div class="col">
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="singleContainerYes" name="singleContainer" [(ngModel)]="mainWizardOptions.singleContainer" [value]="true" #singleContainer="ngModel" required>
+                    <label class="custom-control-label" for="singleContainerYes">Yes</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" class="custom-control-input" id="singleContainerNo" name="singleContainer" [(ngModel)]="mainWizardOptions.singleContainer" [value]="false" required>
+                    <label class="custom-control-label" for="singleContainerNo">No</label>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary btn-block" (click)="mainWizardOptions.page='STEPPER'" [disabled]="singleContainer.errors" ngbTooltip="Answer the question above first" [disableTooltip]="!singleContainer.errors">Start with the first
+                        container</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div *ngIf="mainWizardOptions.page === 'STEPPER'">
+    <app-wizard-stepper-container [mainWizardOptions]="mainWizardOptions" [request]="request"></app-wizard-stepper-container>
+</div>
+<div *ngIf="mainWizardOptions.page === 'CONTAINER'">
+    <app-wizard-container [mainWizardOptions]="mainWizardOptions" [request]="request" [container]="mainWizardOptions.currentContainer"></app-wizard-container>
+</div>
+<div *ngIf="mainWizardOptions.page === 'DATABASE'">
+    <app-wizard-database [mainWizardOptions]="mainWizardOptions" [request]="request" [database]="mainWizardOptions.currentDatabase"></app-wizard-database>
+</div>
+<div *ngIf="mainWizardOptions.page === 'LINK'">
+    <app-wizard-link [mainWizardOptions]="mainWizardOptions" [request]="request"></app-wizard-link>
+</div>
+<div *ngIf="mainWizardOptions.page === 'RESULT'">
+    <app-wizard-result [mainWizardOptions]="mainWizardOptions" [request]="request"></app-wizard-result>
+</div>
+<div *ngIf="mainWizardOptions.page === 'EDIT_LINK'">
+    <app-wizard-edit-link [mainWizardOptions]="mainWizardOptions" [request]="request" [link]="mainWizardOptions.currentLink"></app-wizard-edit-link>
+</div>
+<div *ngIf="mainWizardOptions.page === 'YAML'">
+    <app-result [request]="request" [deployment]="mainWizardOptions.deployment"></app-result>
+</div>

@@ -1,0 +1,7 @@
+cassandra(Example)
+elasticsearch(+Kibana+ES-HQ)
+guestbook(Example)
+httpd
+microservices-demo
+nginx
+wordpress(with phpmyadmin)

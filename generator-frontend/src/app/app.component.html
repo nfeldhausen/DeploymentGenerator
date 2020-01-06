@@ -1,0 +1,20 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<header>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #385189;">
+        <a routerLink="/welcome" class="navbar-brand"><img src="https://seeklogo.com/images/K/kubernetes-logo-3A67038EAB-seeklogo.com.png" width="30" height="30" /> Kubernetes Deployment Generator</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" routerLink="/welcome" routerLinkActive="active">Welcome</a>
+                <a class="nav-item nav-link" routerLink="/wizard" routerLinkActive="active">Wizard</a>
+                <a class="nav-item nav-link" routerLink="/template" routerLinkActive="active">Templates</a>
+                <a class="nav-item nav-link" routerLink="/advanced" routerLinkActive="active">Advanced Mode</a>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container-xl">
+    <router-outlet></router-outlet>
+</div>

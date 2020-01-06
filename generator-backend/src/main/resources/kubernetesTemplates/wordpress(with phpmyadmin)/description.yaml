@@ -1,0 +1,113 @@
+deployments:
+  - name: mysql
+    description: 'Database for wordpress (Saves comments, users etc.)'
+    image: 'MYSQL image 5.6 is required, because wordpress does not support the new authentication methods implemented in newer mysql versions'
+    replicas: 'The Database is a single container, because it is not possible to scale the database'
+    env:
+      - name: MYSQL_USER
+        description: 'Username of a normal MYSQL user. Default: changeme'
+      - name: MYSQL_ROOT_PASSWORD
+        description: 'Password of the mysql root user. Default: changeme'
+      - name: MYSQL_PASSWORD
+        description: 'Password of the user created by MYSQL_USER. Default: changeme'
+      - name: MYSQL_DATABASE
+        description: 'Name of the created database. Default: changeme'
+    port:
+      - name: mysql
+        description: 'Default port of the MYSQL process'
+    storage:
+      - name: mysql-data
+        description: 'Provides persistent storage for the MYSQL data folder under /var/lib/mysql'
+    requests:
+      cpu: 'Does not need to be that high'
+      memory: 'Database memory should be at least 512Mi'
+    limits:
+      cpu: 'Half a cpu core should be enough for most applications and moderate load'
+      memory: '1Gi should be enough for most databases with moderate load'
+    liveness:
+      failure: "Amount of times the probe needs to fail until the pod is declared as not healthy"
+      initial: "Amount of time the probe waits before performing it's action"
+      period: "Amount of time between the Probes action"
+      success: "Amount of times the probe needs to success until the pod is declared as healthy"
+      timeout: "Amount of time the probe tries to connect to the specified port/http action"
+      tcpPort: "The Probe tries to connect to the default MYSQL Port on 3306 and fails if it is not possible"
+    readiness:
+      failure: "Amount of times the probe needs to fail until the pod is declared as not healthy"
+      initial: "Amount of time the probe waits before performing it's action. Readiness probe should start at 0 seconds. To immediately check for the containers readiness"
+      period: "Amount of time between the Probes action. Should be a shorter period of time than the liveness period seconds, to stop sending traffic to the pod earlier"
+      success: "Amount of times the probe needs to success until the pod is declared as healthy"
+      timeout: "Amount of time the probe tries to connect to the specified port/http action"
+      tcpPort: "The Probe tries to connect to the default MYSQL Port on 3306 and fails if it is not possible"
+  - name: phpmyadmin
+    description: 'Frontend to administrate the database'
+    image: 'Official phpmyadmin image'
+    replicas: "PHPMYADMIN is not scaleable, because it requires persistent storage and thus can't be easily scaled"
+    env:
+      - name: PMA_HOST
+        description: 'Service name of the mysql database'
+    port:
+      - name: http
+        description: "Default HTTP port to communicate with the frontend"
+    requests:
+      cpu: 'Does not do complex computational tasks'
+      memory: 'Does not need to be that high'
+    limits:
+      cpu: '10% of a CPU should be enough for all computational tasks'
+      memory: '150Mi should be enough to run this container'
+  - name: wordpress
+    description: "Wordpress Web Frontend to publish Blogs, posts, forums etc"
+    image: "Offical Wordpress Image"
+    replicas: "Single container, because wordpress is not stateless. It saves pictures to the harddisk and thus can't be easily scaled"
+    env:
+      - name: WORDPRESS_DB_HOST
+        description: "Should be the MYSQL Service"
+      - name: WORDPRESS_DB_USER
+        description: "Which user to use for the database connection. In this case use the same value as for MYSQL_USER"
+      - name: WORDPRESS_DB_PASSWORD
+        description: "Password of the database user for the database connection. In this case use the same value as for MYSQL_PASSWORD"
+      - name: WORDPRESS_DB_NAME
+        description: "Which database of the database to use. In this case use the same value as for MYSQL_DATABASE"
+    requests:
+      cpu: "Shouldn't be that computational intensive"
+      memory: "Do not use to little memory, because wordpress may cache pictures in memory"
+    limits:
+      cpu: "Shouldn't be that computational intensive"
+      memory: "256Mi should be enough for moderate usage"
+    port:
+      - name: http
+        description: "Default HTTP port to communicate with the frontend"
+    storage:
+      - name: html
+        description: "Stores the Wordpress html folder, to persist images"
+    liveness:
+      failure: "Amount of times the probe needs to fail until the pod is declared as not healthy"
+      initial: "Amount of time the probe waits before performing it's action"
+      period: "Amount of time between the Probes action"
+      success: "Amount of times the probe needs to success until the pod is declared as healthy"
+      timeout: "Amount of time the probe tries to connect to the specified port/http action"
+      httpPath: "The http path which the probe tries to reach (In case you are using Kubernetes version 1.13 or lower the probe may fail. Use a TCP Action on port 80 instead)"
+      httpPort: "Default HTTP port on which the server runs"
+    readiness:
+      failure: "Amount of times the probe needs to fail until the pod is declared as not healthy"
+      initial: "Amount of time the probe waits before performing it's action. Readiness probe should start at 0 seconds. To immediately check for the containers readiness"
+      period: "Amount of time between the Probes action. Should be a shorter period of time than the liveness period seconds, to stop sending traffic to the pod earlier"
+      success: "Amount of times the probe needs to success until the pod is declared as healthy"
+      timeout: "Amount of time the probe tries to connect to the specified port/http action"
+      httpPath: "The http path which the probe tries to reach (In case you are using Kubernetes version 1.13 or lower the probe may fail. Use a TCP Action on port 80 instead)"
+      httpPort: "Default HTTP port on which the server runs"
+
+services:
+  - name: wordpress-phpmyadmin-service
+    description: "Service to make phpmyadmin accessible with a webbrowser"
+    type: "By default this service should use a LoadBalancer service. If your cluster does not support that, use NodePort instead"
+    selector: "Should select the phpmyadmin container"
+    port:
+      - name: http
+        description: "Default HTTP port for easy communication with a webbrowser"
+  - name: wordpress-service
+    description: "Service to make wordpress accessible with a webbrowser"
+    type: "By default this service should use a LoadBalancer service. If your cluster does not support that, use NodePort instead"
+    selector: "Should select the wordpress container"
+    port:
+      - name: http
+        description: "Default HTTP port for easy communication with a webbrowser"

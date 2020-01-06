@@ -1,0 +1,23 @@
+<form #f="ngForm" (ngSubmit)="submitted = true; f.form.valid && submit()" *ngIf="!showResult" [@blockInitialRenderAnimation]>
+    <ngb-alert *ngIf="submitted && !f.form.valid" type="danger" class="fixed-top container animated fadeIn"><i class="fas fa-2x fa-exclamation-triangle"></i> Not all fields are filled</ngb-alert>
+    <app-advanced-container [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-container>
+    <app-advanced-database [request]="request" [submitted]="submitted" [availableDatabases]="availableDatabases">
+    </app-advanced-database>
+    <app-advanced-service [request]="request" [submitted]="submitted" [description]="description?.services"></app-advanced-service>
+    <app-advanced-link [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-link>
+
+    <div class="form-row">
+        <div class="col" *ngIf="request.containers.length || request.databases.length">
+            <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-share-square"></i> Submit</button>
+        </div>
+        <div class="col" *ngIf="request.containers.length || request.databases.length || request.services.length || request.links.length">
+            <button type="button" class="btn btn-danger btn-block" (click)="reset()"><i class="fas fa-sync-alt"></i>
+        Reset</button>
+        </div>
+    </div>
+</form>
+<div class="row" *ngIf="showResult">
+    <div class="col">
+        <app-result [deployment]="deployment" [request]="request"></app-result>
+    </div>
+</div>

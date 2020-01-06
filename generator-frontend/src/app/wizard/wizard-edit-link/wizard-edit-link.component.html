@@ -1,0 +1,69 @@
+<div class="row">
+    <div class="col">
+        <p class="m-0">On this page it is possible to edit an existing link or to create a new link</p>
+    </div>
+</div>
+<form #editLinkForm="ngForm" (ngSubmit)="submitted = true; editLinkForm.valid && getNextPage()">
+    <div class="form-row mb-2">
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Name*</span>
+                </div>
+                <input type="text" class="form-control" placeholder="Variable Name" [(ngModel)]="link.name" name="{{link.uniqueName}}-name" required #name="ngModel" [ngClass]="{'is-invalid': submitted && name.invalid}">
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Scheme</span>
+                </div>
+                <input type="text" class="form-control" placeholder="&lt;link&gt;" [(ngModel)]="link.scheme" name="{{link.uniqueName}}-scheme" #scheme="ngModel" [ngClass]="{'is-invalid': submitted && scheme.invalid}">
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">containerFrom</span>
+                </div>
+                <select class="custom-select" [(ngModel)]="link.containerFrom" name="{{link.uniqueName}}-containerFrom" required #containerFrom="ngModel" [ngClass]="{'is-invalid': submitted && containerFrom.invalid}">
+                    <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                        {{container.name}}</option>
+                </select>
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">containerTo</span>
+                </div>
+                <select class="custom-select" [(ngModel)]="link.containerTo" name="{{link.uniqueName}}-containerTo" required #containerTo="ngModel" [ngClass]="{'is-invalid': submitted && containerTo.invalid}">
+                    <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                        {{container.name}}</option>
+                </select>
+                <div class="invalid-feedback">
+                    This field is required
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" *ngIf="!mainWizardOptions.addLink">
+        <div class="col">
+            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'ADD'">Submit & Show Summary</button>
+        </div>
+    </div>
+    <div class="form-row" *ngIf="mainWizardOptions.addLink">
+        <div class="col">
+            <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'ABORT_INSERT'; getNextPage()">Abort</button>
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'INSERT'">Add</button>
+        </div>
+    </div>
+</form>

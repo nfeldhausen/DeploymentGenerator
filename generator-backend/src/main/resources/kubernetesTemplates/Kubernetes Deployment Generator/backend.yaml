@@ -1,0 +1,46 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "backend"
+  labels:
+    app: "backend"
+    tier: "backend"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "backend"
+      tier: "backend"
+  template:
+    metadata:
+      labels:
+        app: "backend"
+        tier: "backend"
+    spec:
+      containers:
+        - image: "nfeldhausen/backend"
+          name: "backend"
+          env:
+            - name: "DOCKER_HOST"
+              value: "tcp://docker-in-docker:2375"
+          ports:
+            - containerPort: 8080
+              protocol: "TCP"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "backend"
+  labels:
+    app: "backend"
+    tier: "backend"
+spec:
+  ports:
+    - name: "tomcat"
+      port: 8080
+      protocol: "TCP"
+  selector:
+    app: "backend"
+    tier: "backend"
+  type: "ClusterIP"

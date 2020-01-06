@@ -1,0 +1,145 @@
+deployments:
+  - name: es-client
+    description: The Client or Coordinator of an Elasticsearchcluster communicates with the data nodes and is the access point for the outer world
+    image: Unofficial image for a elasticsearch cluster, which currently is not maintained anymore
+    replicas: More than one replica ensures high availibility in case one container crashes
+    env:
+    - name: CLUSTER_NAME
+      description: The name of the elasticsearch cluster. Should be the same for all elasticsearch containers!
+    - name: NODE_MASTER
+      description: 'Defines whether the container is a master node or not. Possible values: true, false'
+    - name: NODE_DATA
+      description: 'Defines whether the container is a data node or not. Possible values: true, false'
+    - name: HTTP_ENABLE
+      description: 'Defines whether the container is accessible via http. Possible values: true, false'
+    - name: ES_JAVA_OPTS
+      description: 'Sets the heap size of the java JVM. Higher numbers mean more ram allocated for the java JVM, but also more ram necessary for the container. Default value: 256m'
+    - name: NETWORK_HOST
+      description: '??? I dont realy know...'
+    - name: DISCOVERY_SERVICE
+      description: 'The name of the kubernetes elasticsearch service (The name of the master containers service)'
+    port:
+    - name: http
+      description: 'Default HTTP Port for elasticsearch. Default value: 9200'
+    - name: transport
+      description: 'Default Port for the intra communication with other clients. Default value: 9300'
+    requests:
+      cpu: 'Value should be enough so the process will not starve'
+      memory: 'Value should be at least the same value as in the environment variable ES_JAVA_OPTS'
+    limits:
+      cpu: 'Value must be higher than the cpu request and should be enogh so the process will not starve'
+      memory: 'Value must be higher than the memory request and should be higher as the value in the environment variable ES_JAVA_OPTS'
+
+  - name: es-data
+    description: Data container of the elasticsearch cluster
+    image: Unofficial image for a elasticsearch cluster, which currently is not maintained anymore
+    replicas: More than one replica ensures availability of the data
+    env:
+      - name: CLUSTER_NAME
+        description: 'The name of the elasticsearch cluster. Should be the same for all elasticsearch containers!'
+      - name: NODE_MASTER
+        description: 'Defines whether the container is a master node or not. Possible values: true, false'
+      - name: HTTP_ENABLE
+        description: 'Defines whether the container is accessible via http. Possible values: true, false'
+      - name: ES_JAVA_OPTS
+        description: 'Sets the heap size of the java JVM. Higher numbers mean more ram allocated for the java JVM, but also more ram necessary for the container. Default value: 256m'
+      - name: NODE_INGEST
+        description: 'Defines whether this container pre-processes documents before indexing. Possible values: true, false'
+      - name: DISCOVERY_SERVICE
+        description: 'The name of the kubernetes elasticsearch service (The name of the master containers service)'
+    port:
+      - name: transport
+        description: 'Default Port for the intra communication with other data nodes. Default value: 9300'
+    storage:
+      - name: storage
+        description: "Persistent Storage for the elasticsearch data. Mounpath is the elasticsearch data directory"
+    requests:
+      cpu: 'Value should be enough so the process will not starve'
+      memory: 'Value should be at least the same value as in the environment variable ES_JAVA_OPTS'
+    limits:
+      cpu: 'Value must be higher than the cpu request and should be enogh so the process will not starve'
+      memory: 'Value must be higher than the memory request and should be higher as the value in the environment variable ES_JAVA_OPTS'
+
+  - name: es-hq
+    description: 'Frontend to monitor the elasticsearch cluster. This container is not necessary for the elasticsearch cluster and it would work without it.'
+    image: 'Official Image for the elastichsearch-hq frontend'
+    replicas: 'Only one replica, because this application is not stateless. It saves the name of the cluster on its storage, which would not be the same across all pods'
+    env:
+      - name: HQ_DEFAULT_URL
+        description: 'Default URL of the elasticsearch cluster. In Kubernetes the default URL may not work for unknown reasons. In this case use the service name of the elasticsearch clients in the frontend instead.'
+    port:
+      - name: http
+        description: 'Default HTTP port of the frontend. Default value: 5000'
+    requests:
+      cpu: 'Values do not have to be that high, because the frontend does not do a lot of computation'
+      memory: '128MB for the frontend should be enough'
+
+  - name: es-kibana
+    description: 'Frontend to visualize data in the elasticsearch cluster'
+    image: 'Official Image for Kibana'
+    replicas: 'Only one replica, because this application is not stateless.'
+    env:
+      - name: CLUSTER_NAME
+        description: 'Name of the elasticsearch cluster. Should be the same as the cluster name of the different elasticsearch container'
+      - name: ELASTICSEARCH_URL
+        description: "URL of the elasticsearch cluster. Kibana will talk to the elasticsearch clients to get it's data"
+    port:
+      - name: http
+        description: 'Default HTTP port of the frontend. Default value: 5601'
+    requests:
+      cpu: 'Values do not have to be that high, because the frontend does not do a lot of computation'
+      memory: '256MB for the frontend should be enough'
+
+  - name: es-master
+    description: Master container for the elasticsearch cluster.
+    image: Unofficial image for a elasticsearch cluster, which currently is not maintained anymore
+    replicas: More than one replica ensures high availibility in case one container crashes. Master will automatically elect a leader for the cluster.
+    env:
+      - name: CLUSTER_NAME
+        description: 'The name of the elasticsearch cluster. Should be the same for all elasticsearch containers!'
+      - name: NUMBER_OF_MASTERS
+        description: 'Number of eligible Masters nodes to avoid the split brain problem. Should be the (number of nodes/2 + 1). Default: 2'
+      - name: NODE_MASTER
+        description: 'Defines whether the container is a master node or not. Possible values: true, false'
+      - name: NODE_INGEST
+        description: 'Defines whether this container pre-processes documents before indexing. Possible values: true, false'
+      - name: NODE_DATA
+        description: 'Defines whether the container is a data node or not. Possible values: true, false'
+      - name: HTTP_ENABLE
+        description: 'Defines whether the container is accessible via http. Possible values: true, false'
+      - name: ES_JAVA_OPTS
+        description: 'Sets the heap size of the java JVM. Higher numbers mean more ram allocated for the java JVM, but also more ram necessary for the container. Default value: 256m'
+      - name: DISCOVERY_SERVICE
+        description: 'The name of the kubernetes elasticsearch service (The name of the master containers service)'
+    port:
+      - name: transport
+        description: 'Default Port for the intra communication with other masters. Default value: 9300'
+    requests:
+      cpu: 'Value should be enough so the process will not starve'
+      memory: 'Value should be at least the same value as in the environment variable ES_JAVA_OPTS'
+    limits:
+      cpu: 'Value must be higher than the cpu request and should be enogh so the process will not starve'
+      memory: 'Value must be higher than the memory request and should be higher as the value in the environment variable ES_JAVA_OPTS'
+
+services:
+  - name: es-kibana
+    description: 'Exposes Kibana to be externally accessible with a webbrowser'
+    type: 'Exposes Kibana with a LoadBalancer Service - If your cluster does not support LoadBalancers, use NodePort instead'
+    selector: 'Should select the Kibana container'
+    port:
+      - name: http
+        description: "This port targets the Kibana port 5601, but makes the Kibana port accessible via port 80, such that you don't have to provide a port in your webbrowser"
+  - name: es-hq
+    description: 'Exposes Kibana to be externally accessible with a webbrowser'
+    type: 'Exposes ES-HQ with a LoadBalancer Service - If your cluster does not support LoadBalancers, use NodePort instead'
+    selector: 'Should select the ES-HQ container'
+    port:
+      - name: http
+        description: "This port targets the ES-HQ port 5000, but makes it accessible via port 80, such that it is not necessary to provide a port in the webbrowser"
+  - name: elasticsearch
+    description: "Exposes all necessary ports of the elasticsearch cluster to be externally accessible"
+    type: 'Exposes elasticsearch with a LoadBalancer Service - If your cluster does not support LoadBalancers, use NodePort instead'
+    selector: 'Should select the elastichsearch client container'
+    port:
+      - name: http
+        description: "Exposes the only necessary port to communicate with the elasticsearch cluster - All traffic gets processed by the clients. All communication takes place over http"

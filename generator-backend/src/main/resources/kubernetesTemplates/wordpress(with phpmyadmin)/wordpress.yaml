@@ -1,0 +1,135 @@
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "wordpress-environment"
+  labels:
+    app: "wordpress"
+    stage: "frontend"
+data:
+  WORDPRESS_DB_NAME: "changeme"
+---
+apiVersion: "v1"
+kind: "Secret"
+metadata:
+  name: "wordpress-secret"
+  labels:
+    app: "wordpress"
+    stage: "frontend"
+type: "Opaque"
+data:
+  WORDPRESS_DB_USER: "Y2hhbmdlbWU="
+  WORDPRESS_DB_PASSWORD: "Y2hhbmdlbWU="
+---
+apiVersion: "apps/v1"
+kind: "StatefulSet"
+metadata:
+  name: "wordpress"
+  labels:
+    app: "wordpress"
+    stage: "frontend"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "wordpress"
+      stage: "frontend"
+  serviceName: "wordpress-internal"
+  template:
+    metadata:
+      labels:
+        app: "wordpress"
+        stage: "frontend"
+    spec:
+      containers:
+        - image: "wordpress"
+          name: "wordpress"
+          env:
+            - name: "WORDPRESS_DB_HOST"
+              value: "wordpress-mysql-service"
+          ports:
+            - containerPort: 80
+              name: "http"
+              protocol: "TCP"
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: "/"
+              port: 80
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: "/var/www/html"
+              name: "html"
+              subPath: "wordpress"
+          envFrom:
+            - configMapRef:
+                name: "wordpress-environment"
+            - secretRef:
+                name: "wordpress-secret"
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: "256Mi"
+            requests:
+              cpu: "0.1"
+              memory: "128Mi"
+  volumeClaimTemplates:
+    - apiVersion: "v1"
+      kind: "PersistentVolumeClaim"
+      metadata:
+        name: "html"
+        labels:
+          app: "wordpress"
+          stage: "frontend"
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "10240Mi"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "wordpress-internal"
+  labels:
+    app: "wordpress"
+    stage: "frontend"
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      protocol: "TCP"
+  selector:
+    app: "wordpress"
+    stage: "frontend"
+  type: "ClusterIP"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "wordpress-service"
+  labels:
+    app: "wordpress"
+    stage: "frontend"
+spec:
+  ports:
+    - name: "http"
+      port: 80
+      targetPort: 80
+      protocol: "TCP"
+  selector:
+    app: "wordpress"
+    stage: "frontend"
+  type: "LoadBalancer"

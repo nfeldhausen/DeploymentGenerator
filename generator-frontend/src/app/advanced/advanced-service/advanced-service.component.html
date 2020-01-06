@@ -1,0 +1,300 @@
+<div class="row mb-2">
+    <div class="col">
+        <button type="button" class="btn btn-primary" (click)="addService()"><i class="fas fa-plus"></i> Add
+            Service</button>
+    </div>
+</div>
+<div class="row p-2 border border-dark mb-2" *ngFor="let service of request.services" [@enterAnimation]>
+    <div class="col" *ngVar="getDescriptionForService(service.name) as serviceDescription">
+        <div class="row">
+            <div class="col">
+                <div class="row mb-2">
+                    <div class="col-9 my-auto">
+                        <h2 class="font-weight-bold text-truncate my-auto"><i class="fas fa-info-circle" *ngIf="serviceDescription?.description" [autoClose]="'outside'" ngbPopover="{{serviceDescription.description}}"></i> {{service.name | uppercase}} Service</h2>
+                    </div>
+                    <div class="col-3 my-auto">
+                        <button type="button" (click)="deleteService(service)" class="btn btn-danger float-right my-auto"><i class="fas fa-trash-alt"></i> Delete
+                            Service</button>
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Name*</span>
+                    </div>
+                    <input type="text" class="form-control" [(ngModel)]="service.name" placeholder="Name" name="{{service.uniqueName + '-service'}}" #sname="ngModel" [ngClass]="{'is-invalid': submitted && sname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" required (ngModelChange)="changeServiceDescription(service.name, serviceDescription)"
+                    />
+                    <div class="invalid-feedback">
+                        Service name can not be empty.
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                            *ngIf="serviceDescription?.type" [autoClose]="'outside'" ngbPopover="{{serviceDescription.type}}"></i>Type*</span>
+                    </div>
+                    <select class="custom-select" [(ngModel)]="service.type" name="{{service.uniqueName + '-type'}}" #stype="ngModel" [ngClass]="{'is-invalid': submitted && stype.invalid}" required (change)="service.typeChanged()">
+                        <option>NodePort</option>
+                        <option>LoadBalancer</option>
+                        <option>Ingress</option>
+                    </select>
+                    <div class="invalid-feedback">
+                        Service type must be of type NodePort, LoadBalancer or Ingress
+                    </div>
+                </div>
+
+                <!--HIER-->
+                <div *ngIf="service.type === 'NodePort' || service.type === 'LoadBalancer'" [@enterAnimation]>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h3 class="my-auto">Options</h3>
+                        </div>
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="serviceDescription?.selector" [autoClose]="'outside'" ngbPopover="{{serviceDescription.selector}}"></i>Container*</span>
+                        </div>
+                        <select class="custom-select" [(ngModel)]="service.normalServiceOptions.containerName" name="{{service.normalServiceOptions.uniqueName + '-container'}}" #scontainer="ngModel" (change)="getPortsForService(service)" [ngClass]="{'is-invalid': submitted && scontainer.invalid}"
+                            required>
+                            <option [ngValue]="container.uniqueName" *ngFor="let container of request.containers">
+                                {{container.name}} ({{container.uniqueName}})
+                            </option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Referenced container for service can not be empty
+                        </div>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="{{service.normalServiceOptions.uniqueName + '-affinity'}}" name="{{service.normalServiceOptions.uniqueName + '-affinity'}}" [(ngModel)]=service.normalServiceOptions.sessionAffinity>
+                        <label class="custom-control-label" for="{{service.normalServiceOptions.uniqueName + '-affinity'}}">Set
+                            Session
+                            Affinity</label>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h4 class="my-auto">Ports</h4>
+                        </div>
+                        <div class="col-auto">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary float-right" (click)="getPortsForService(service)"><i class="fas fa-sync-alt"></i> Reset to
+                                        Container
+                                        Ports</button>
+                                <button type="button" class="btn btn-primary" (click)="service.normalServiceOptions.addPort()"><i class="fas fa-plus"></i> Add
+                                            Port</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2" *ngFor="let port of service.normalServiceOptions.ports" [@enterAnimation]>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend" *ngVar="getObjectFromDescription(serviceDescription?.port, port.name) as portDescription">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="portDescription" [autoClose]="'outside'" ngbPopover="{{portDescription.description}}"></i>Name</span>
+                                </div>
+                                <input type="text" class="form-control" [(ngModel)]="port.name" placeholder="Name" name="{{port.uniqueName + '-name'}}" #pname="ngModel" [ngClass]="{'is-invalid': submitted && pname.invalid}" pattern="[0-9]*[a-z]+[a-z0-9]*" nullValue/>
+                                <div class="invalid-feedback">
+                                    Port name must follow the pattern: [0-9]*[a-z]+[a-z0-9]* and should be set when more than two ports are used.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Port*</span>
+                                </div>
+                                <input type="number" class="form-control" [(ngModel)]="port.port" placeholder="1-65535" min="1" max="65535" name="{{port.uniqueName + '-sport'}}" #pport="ngModel" [ngClass]="{'is-invalid': submitted && pport.invalid}" required customMin="1" customMax="65535"
+                                />
+                                <div class="invalid-feedback">
+                                    Port must be a number between 1 and 65535
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">TargetPort</span>
+                                </div>
+                                <input type="number" class="form-control" [(ngModel)]="port.targetPort" name="{{port.uniqueName + '-targetPort'}}" #tPortvalue="ngModel" placeholder="Defaults to: port" min="1" max="65535" [ngClass]="{'is-invalid': submitted && tPortvalue.invalid}" customMin="1"
+                                    customMax="65535" />
+                                <div class="invalid-feedback">
+                                    Port number must be a number between 1 and 65535
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Protocol*</span>
+                                </div>
+                                <select class="custom-select" [(ngModel)]="port.protocol" name="{{port.uniqueName + '-protocol'}}" #pprot="ngModel" [ngClass]="{'is-invalid': submitted && pprot.invalid}" required>
+                                    <option>TCP</option>
+                                    <option>UDP</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Port protocol must be TCP or UDP
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary" (click)="service.normalServiceOptions.deletePort(port)"><i class="fas fa-trash-alt"
+                                    title="Delete"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!--HIER-->
+                <div *ngIf="service.type === 'Ingress'" [@enterAnimation]>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h3 class="my-auto">Ingress Options</h3>
+                        </div>
+                    </div>
+                    <div class="input-group mb-2">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Ingress Type*</span>
+                        </div>
+                        <select class="custom-select" [(ngModel)]="service.ingressOptions.serviceType" name="{{service.ingressOptions.uniqueName + '-type'}}" #sitype="ngModel" [ngClass]="{'is-invalid': submitted && sitype.invalid}" required>
+                            <option>NodePort</option>
+                            <option>LoadBalancer</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Ingress Service Type can not be empty
+                        </div>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="{{service.ingressOptions.uniqueName + '-affinity'}}" name="{{service.ingressOptions.uniqueName + '-affinity'}}" [(ngModel)]=service.ingressOptions.affinity>
+                        <label class="custom-control-label" for="{{service.ingressOptions.uniqueName + '-affinity'}}">Set
+                            Session
+                            Affinity</label>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h4 class="my-auto">Http Paths</h4>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary float-right" (click)="service.ingressOptions.addHttpOption()"><i class="fas fa-plus"></i> Add HTTP
+                                Option</button>
+                        </div>
+                    </div>
+                    <div class="form-row" *ngFor="let httpOption of service.ingressOptions.httpOptions" [@enterAnimation]>
+                        <div class="col-4">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Host*</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Host Address" name="{{httpOption.uniqueName}} + '-host'" [(ngModel)]="httpOption.host" required #hohost="ngModel" [ngClass]="{'is-invalid': submitted && hohost.invalid}">
+                                <div class="invalid-feedback">
+                                    Host Address can not be empty
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-row mb-2" *ngFor="let httpPath of httpOption.paths" [@enterAnimation]>
+                                <div class="col-auto">
+                                    <button type="button" class="btn btn-primary" (click)="httpOption.pathManipulation($event, httpPath)"><i class="fas fa-plus"
+                                            title="Add Rule"></i></button>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Container*</span>
+                                        </div>
+                                        <select class="custom-select" name="{{httpPath.uniqueName + '-container'}}" [(ngModel)]="httpPath.container" #hpcon="ngModel" [ngClass]="{'is-invalid': submitted && hpcon.invalid}" required>
+                                            <option *ngFor="let container of request.containers"
+                                                [ngValue]="container.uniqueName">{{container.name}}
+                                                ({{container.uniqueName}})
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Referenced Container can not be empty
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Subpath</span>
+                                        </div>
+                                        <input type="text" class="form-control" name="{{httpPath.uniqueName + '-path'}}" [(ngModel)]="httpPath.path" placeholder="Optional: Subpath">
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text">Port*</span>
+                                        </div>
+                                        <select class="custom-select" name="{{httpPath.uniqueName + '-port'}}" [(ngModel)]="httpPath.port" #hpport="ngModel" [ngClass]="{'is-invalid': submitted && hpport.invalid}" required>
+                                            <option *ngFor="let port of getPortsForContainer(httpPath.container)"
+                                                [ngValue]="port.port">{{port.port}} ({{port.name}})
+                                            </option>
+                                        </select>
+                                        <div class="invalid-feedback">
+                                            Referenced Service Port can not be empty!
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary" (click)="service.ingressOptions.deleteHttpOption(httpOption)"><i
+                                    class="fas fa-trash-alt" title="Delete"></i></button>
+                        </div>
+                    </div>
+
+
+
+
+                    <!--HIER-->
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h4 class="my-auto">TCP Container</h4>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary float-right" (click)="service.ingressOptions.addIngressContainer()"><i class="fas fa-plus"></i> Add
+                                TCP
+                                Container</button>
+                        </div>
+                    </div>
+                    <div class="form-row" *ngFor="let ingContainer of service.ingressOptions.tcpUdpOptions" [@enterAnimation]>
+                        <div class="col">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Container*</span>
+                                </div>
+                                <select class="custom-select" name="{{ingContainer.uniqueName + '-containerName'}}" [(ngModel)]="ingContainer.containerName" #iCname="ngModel" [ngClass]="{'is-invalid': submitted && iCname.invalid}" required>
+                                    <option *ngFor="let container of request.containers"
+                                        [ngValue]="container.uniqueName">
+                                        {{container.name}} ({{container.uniqueName}})</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Referenced container for service can not be empty
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Port*</span>
+                                </div>
+                                <select class="custom-select" name="{{ingContainer.uniqueName + '-port'}}" [(ngModel)]="ingContainer.port" required #iCport="ngModel" [ngClass]="{'is-invalid': submitted && iCport.invalid}">
+                                    <option *ngFor="let port of getPortsForContainer(ingContainer.containerName)"
+                                        [ngValue]="port">{{port.port}}<span
+                                            *ngIf="port.name">-{{port.name}}</span>-{{port.protocol}}</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Port can not be empty
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary" (click)="service.ingressOptions.deleteIngressContainer(ingContainer)"><i
+                                    class="fas fa-trash-alt" title="Delete"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

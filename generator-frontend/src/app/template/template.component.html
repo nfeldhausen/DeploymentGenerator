@@ -1,0 +1,27 @@
+<div *ngIf="!showResult">
+    <div *ngIf="!err">
+        <div class="row mt-2 mb-2">
+            <div class="col">
+                Pick a template:
+            </div>
+        </div>
+        <div class="custom-control custom-radio mb-2" *ngFor="let name of templates">
+            <input type="radio" id="radio-{{name}}" name="customRadio" class="custom-control-input" [value]="name"
+                [(ngModel)]="currentSelected">
+            <label class="custom-control-label" for="radio-{{name}}">{{name}}</label>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary btn-block" (click)="send()">Send</button>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="err">
+        <div class="row mt-2 mb-2" style="color: red;">
+            {{err}}
+        </div>
+    </div>
+</div>
+<div *ngIf="showResult">
+    <app-result [deployment]="deployment" [request]="request" [description]="description"></app-result>
+</div>

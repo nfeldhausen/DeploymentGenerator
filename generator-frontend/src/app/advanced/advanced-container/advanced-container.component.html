@@ -1,0 +1,633 @@
+<div class="row mb-2">
+    <div class="col">
+        <button type="button" class="btn btn-primary" (click)="addContainer()"><i class="fas fa-plus"></i> Add
+            Container</button>
+    </div>
+</div>
+<div class="row p-2 border border-dark mb-2" *ngFor="let container of request.containers" [@enterAnimation]>
+    <div class="col" *ngVar="getDescriptionForContainer(container.name) as containerDescription">
+        <div class="row">
+            <div class="col">
+                <div class="row mb-2">
+                    <div class="col-9">
+                        <div class="row">
+                            <div class="col-6 my-auto">
+                                <h2 class="font-weight-bold text-truncate my-auto"><i class="fas fa-info-circle" *ngIf="containerDescription?.description" [autoClose]="'outside'" ngbPopover="{{containerDescription.description}}"></i> {{container.name | uppercase}} Container
+                                </h2>
+                            </div>
+                            <div class="col-6 my-auto text-muted">
+                                <small class="my-auto">ID: {{container.uniqueName}}</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-3 my-auto">
+                        <button type="button" (click)="deleteContainer(container)" class="btn btn-danger float-right"><i
+                                class="fas fa-trash-alt"></i> Delete
+                            Container</button>
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Name*</span>
+                    </div>
+                    <input type="text" class="form-control" [(ngModel)]="container.name" placeholder="Name" name="{{container.uniqueName + '-name'}}" #name="ngModel" (ngModelChange)="changeDescriptionName(container.name,containerDescription)" [ngClass]="{'is-invalid': submitted && name.invalid}"
+                        pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" required />
+                    <div class="invalid-feedback">
+                        Container name can not be empty.
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.image" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.image}}"></i>Image*</span>
+                    </div>
+                    <input type="text" class="form-control" [(ngModel)]="container.image" placeholder="Image" name="{{container.uniqueName + '-image'}}" #image="ngModel" [ngClass]="{'is-invalid': submitted && image.invalid}" [ngbTypeahead]="search" (ngModelChange)="getImageAnalysis($event, container)"
+                        required />
+                    <div class="invalid-feedback">
+                        Container image can not be empty.
+                    </div>
+                </div>
+                <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.replicas" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.replicas}}"></i>Replicas*</span>
+                    </div>
+                    <input type="number" class="form-control" [(ngModel)]="container.replicas" placeholder="Replicas" name="{{container.uniqueName + '-replicas'}}" #replica="ngModel" [ngClass]="{'is-invalid': submitted && replica.invalid}" required min="1" customMin="1"
+                    />
+                    <div class="invalid-feedback">
+                        Container replicas can not be empty and must be a positive number.
+                    </div>
+                </div>
+                <div class="form-row mb-2">
+                    <div class="col my-auto">
+                        <h3 class="my-auto">Persistent Storage</h3>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary float-right" [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.mountPaths === null || container.analysis.mountPaths.length === 0" (click)="appendImageMountPaths(container)"><span class="spinner-border spinner-border-sm"
+                                    role="status" aria-hidden="true" *ngIf="container.loadingAnalysis"></span> Append
+                                Image MountPaths</button>
+                            <button type="button" class="btn btn-primary float-right" (click)="container.addStorage()"><i
+                                    class="fas fa-plus"></i> Add
+                                Storage</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row" *ngFor="let storage of container.storage" [@enterAnimation]>
+                    <div class="col-3">
+                        <div class="input-group">
+                            <div class="input-group-prepend" *ngVar="getObjectFromDescription(containerDescription?.storage, storage.name) as storageDescription">
+                                <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="storageDescription" [autoClose]="'outside'"
+                                        ngbPopover="{{storageDescription.description}}"></i>Name</span>
+                            </div>
+                            <input type="text" class="form-control" placeholder="Name of the storage" name="{{storage.uniqueName + '-name'}}" [(ngModel)]="storage.name" #sname="ngModel" [ngClass]="{'is-invalid': submitted && sname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?"
+                                nullValue />
+                            <div class="invalid-feedback">
+                                Name must follow the pattern: [a-z0-9]([-a-z0-9]*[a-z0-9])?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Size*</span>
+                            </div>
+                            <input type="number" class="form-control" placeholder="Size in Mb" name="{{storage.uniqueName + '-size'}}" [(ngModel)]="storage.size" #ssize="ngModel" [ngClass]="{'is-invalid': submitted && ssize.invalid}" required min="1" customMin="1" />
+                            <div class="invalid-feedback">
+                                Size can not be 0 or less than 0
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="form-row mb-2" *ngFor="let mount of storage.storageMounts" [@enterAnimation]>
+                            <div class="col-auto">
+                                <button type="button" class="btn btn-primary" (click)="storage.mountManipulation($event, mount)"><i
+                                        class="fas fa-plus"></i></button>
+                            </div>
+                            <div class="col">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Mountpath*</span>
+                                    </div>
+                                    <input type="text" class="form-control" [(ngModel)]="mount.mountPath" name="{{mount.uniqueName + '-mountPath'}}" #mPath="ngModel" placeholder="absolute MountPath" [ngClass]="{'is-invalid': submitted && mPath.invalid}" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+"
+                                        required />
+                                    <div class="invalid-feedback">
+                                        MountPath can not be empty and must be an absolute path!
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">subPath</span>
+                                    </div>
+                                    <input type="text" class="form-control" [(ngModel)]="mount.subPath" name="{{mount.uniqueName + '-subPath'}}" #msubPath="ngModel" placeholder="relative SubPath" [ngClass]="{'is-invalid': submitted && msubPath.invalid}" pattern="([a-z]|[A-Z]|[0-9]){1}([a-z]|[A-Z]|[0-9]|\/)*"
+                                    />
+                                    <div class="invalid-feedback">
+                                        SubPath must be an relative path
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary float-right" (click)="container.deleteStorage(storage)"><i class="fas fa-trash-alt"
+                                title="Delete"></i></button>
+                    </div>
+                </div>
+                <div class="form-row mb-2">
+                    <div class="col my-auto">
+                        <h3 class="my-auto">Environment Variables</h3>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary float-right" [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.environments === null || container.analysis.environments.length === 0" (click)="appendImageVariables(container)"><span class="spinner-border spinner-border-sm"
+                                    role="status" aria-hidden="true" *ngIf="container.loadingAnalysis"></span> Append
+                                Image Variables</button>
+                            <button type="button" class="btn btn-primary float-right" (click)="container.addEnvironmentVariable()"><i class="fas fa-plus"></i> Add
+                                    Variable</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row mb-2" *ngFor="let variable of container.environments" [@enterAnimation]>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend" *ngVar="getObjectFromDescription(containerDescription?.env, variable.name) as environmentDescription">
+                                <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="environmentDescription" [autoClose]="'outside'"
+                                        ngbPopover="{{environmentDescription.description}}"></i>Name*</span>
+                            </div>
+                            <input type="text" class="form-control mr" [(ngModel)]="variable.name" name="{{variable.uniqueName + '-name'}}" #envname="ngModel" placeholder="Name" [ngClass]="{'is-invalid': submitted && envname.invalid}" pattern="[-._a-zA-Z][-._a-zA-Z0-9]*" required
+                            />
+                            <div class="invalid-feedback">
+                                Environment varibale name can not be empty and must follow the pattern: [-._a-zA-Z][-._a-zA-Z0-9]*
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Value</span>
+                            </div>
+                            <input [type]="variable.secret ? 'password' : 'text'" class="form-control" [(ngModel)]="variable.value" name="{{variable.uniqueName + '-value'}}" #envvalue="ngModel" placeholder="Value" [ngClass]="{'is-invalid': submitted && envvalue.invalid}" />
+                            <div class="invalid-feedback">
+                                Environment Value can not be empty.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto my-auto">
+                        <div class="custom-control custom-checkbox my-auto">
+                            <input type="checkbox" class="custom-control-input" name="{{variable.uniqueName + '-secret'}}" id="{{variable.uniqueName + '-secret'}}" [(ngModel)]="variable.secret">
+                            <label class="custom-control-label" for="{{variable.uniqueName + '-secret'}}">Secret</label>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary" (click)="container.deleteEnvironmentVariable(variable)"><i class="fas fa-trash-alt"
+                                title="Delete"></i></button>
+                    </div>
+                </div>
+                <div class="form-row mb-2">
+                    <div class="col my-auto">
+                        <h3 class="my-auto">Ports</h3>
+                    </div>
+                    <div class="col-auto">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary float-right" [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.ports === null || container.analysis.ports.length === 0" (click)="appendImagePorts(container)"><span class="spinner-border spinner-border-sm"
+                                    role="status" aria-hidden="true" *ngIf="container.loadingAnalysis"></span> Append
+                                Image Ports</button>
+                            <button type="button" class="btn btn-primary float-right" (click)="container.addPort()"><i
+                                    class="fas fa-plus"></i> Add
+                                Port</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-row mb-2" *ngFor="let port of container.ports" [@enterAnimation]>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend" *ngVar="getObjectFromDescription(containerDescription?.port, port.name) as portDescription">
+                                <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="portDescription" [autoClose]="'outside'"
+                                        ngbPopover="{{portDescription.description}}"></i>Name</span>
+                            </div>
+                            <input type="text" class="form-control" [(ngModel)]="port.name" name="{{port.uniqueName + '-name'}}" #portname="ngModel" [ngClass]="{'is-invalid': submitted && portname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" placeholder="Name" nullValue />
+                            <div class="invalid-feedback">
+                                Port name must follow the pattern: [a-z0-9]([-a-z0-9]*[a-z0-9])? and should be set when more than two ports are used.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Port*</span>
+                            </div>
+                            <input type="number" class="form-control" [(ngModel)]="port.port" name="{{port.uniqueName + '-port'}}" #portvalue="ngModel" placeholder="1-65535" min="1" max="65535" [ngClass]="{'is-invalid': submitted && portvalue.invalid}" required customMin="1" customMax="65535"
+                            />
+                            <div class="invalid-feedback">
+                                Port number must be a number between 1 and 65535
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">TargetPort</span>
+                            </div>
+                            <input type="number" class="form-control" [(ngModel)]="port.targetPort" name="{{port.uniqueName + '-targetPort'}}" #tPortvalue="ngModel" placeholder="Defaults to: port" min="1" max="65535" [ngClass]="{'is-invalid': submitted && tPortvalue.invalid}" customMin="1"
+                                customMax="65535" />
+                            <div class="invalid-feedback">
+                                Port number must be a number between 1 and 65535
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Protocol*</span>
+                            </div>
+                            <select class="custom-select" [(ngModel)]="port.protocol" name="{{port.uniqueName + '-protocol'}}" #portproto="ngModel" [ngClass]="{'is-invalid': submitted && portproto.invalid}" required>
+                                <option>TCP</option>
+                                <option>UDP</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Port protocol must be TCP or UDP
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-secondary" (click)="container.deletePort(port)"><i
+                                class="fas fa-trash-alt" title="Delete"></i></button>
+                    </div>
+                </div>
+                <div class="form-row mb-2" *ngIf="container.ports.length" [@enterAnimation]>
+                    <div class="col-auto my-auto">
+                        <div class="custom-control custom-checkbox my-auto">
+                            <input type="checkbox" class="custom-control-input" name="{{container.uniqueName + '-expose'}}" id="{{container.uniqueName + '-expose'}}" [(ngModel)]="container.expose">
+                            <label class="custom-control-label" for="{{container.uniqueName + '-expose'}}">Expose
+                                Container
+                                with
+                                ServiceType:</label>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <select class="custom-select" name="{{container.uniqueName + '-exposeType'}}" [(ngModel)]="container.exposeType">
+                            <option value="NodePort">NodePort</option>
+                            <option value="LoadBalancer">LoadBalancer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="custom-control custom-switch mb-2">
+                    <input type="checkbox" class="custom-control-input" id="{{container.uniqueName}}-advanced" name="{{container.uniqueName}}-advanced" [(ngModel)]="container.advancedOptions">
+                    <label class="custom-control-label" for="{{container.uniqueName}}-advanced">Show Advanced
+                        Options</label>
+                </div>
+                <div *ngIf="container.advancedOptions" [@enterAnimation]>
+                    <div class="row mb-2 border-top border-bottom">
+                        <div class="col my-auto">
+                            <h3 class="my-auto">Advanced Options</h3>
+                        </div>
+                    </div>
+                    <div class="custom-control custom-switch mb-2">
+                        <input type="checkbox" class="custom-control-input" id="{{container.uniqueName}}-privileged" name="{{container.uniqueName}}-privileged" [(ngModel)]="container.containerAdvancedOptions.privileged">
+                        <label class="custom-control-label" for="{{container.uniqueName}}-privileged">Set Container privileged</label>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h4 class="my-auto">Health Check</h4>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <div class="custom-control custom-switch mb-2">
+                                <input type="checkbox" class="custom-control-input" id="{{container.uniqueName}}-generic" name="{{container.uniqueName}}-generic" [(ngModel)]="container.containerAdvancedOptions.httpService">
+                                <label class="custom-control-label" for="{{container.uniqueName}}-generic">Container
+                                    with HTTP
+                                    Service</label>
+                            </div>
+                        </div>
+                        <div class="col" *ngIf="container.containerAdvancedOptions.livenessProbe === null || container.containerAdvancedOptions.livenessProbe === undefined">
+                            <button type="button" class="btn bg-transpartent float-right p-0" style="color: grey;" (click)="container.containerAdvancedOptions.switchLivenessProbe()">Define seperate
+                                Liveness Check</button>
+                        </div>
+                        <div class="col" *ngIf="container.containerAdvancedOptions.livenessProbe !== null && container.containerAdvancedOptions.livenessProbe !== undefined">
+                            <button type="button" class="btn bg-transpartent float-right p-0" style="color: grey;" (click)="container.containerAdvancedOptions.switchLivenessProbe()">Delete seperate
+                                Liveness Check</button>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <div class="row mb-2">
+                                <div class="col my-auto">
+                                    <h5 class="my-auto text-center">Readiness Check</h5>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-rpInitialThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.initial"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.initial}}"></i>Start Checking
+                                    After:
+                                    {{container.containerAdvancedOptions.readinessProbe.initialDelaySeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-rpInitialThreshold'}}" name="{{container.uniqueName + '-rpInitialThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.getReadinessProbe().initialDelaySeconds" min="0" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-rpPeriodSeconds'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.period"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.period}}"></i>Check Interval:
+                                    {{container.containerAdvancedOptions.readinessProbe.periodSeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-rpPeriodSeconds'}}" name="{{container.uniqueName + '-rpPeriodSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.periodSeconds" min="1" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-rpSuccessThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.success"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.success}}"></i>Healthy After:
+                                    {{container.containerAdvancedOptions.readinessProbe.successThreshold}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-rpSuccessThreshold'}}" name="{{container.uniqueName + '-rpSuccessThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.successThreshold" min="1" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-rpTimeoutSeconds'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.timeout"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.timeout}}"></i>Check Timeout:
+                                    {{container.containerAdvancedOptions.readinessProbe.timeoutSeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-rpTimeoutSeconds'}}" name="{{container.uniqueName + '-rpTimeoutSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.timeoutSeconds" min="1" max="100">
+                            </div>
+                            <div class="input-group mb-2">
+                                <label for="{{container.uniqueName + '-rpFailureThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.failure"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.failure}}"></i>Unhealthy After:
+                                    {{container.containerAdvancedOptions.readinessProbe.failureThreshold}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-rpFailureThreshold'}}" name="{{container.uniqueName + '-rpFailureThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.failureThreshold" min="1" max="100">
+                            </div>
+                            <div class="input-group mb-2" *ngIf="!container.containerAdvancedOptions.httpService">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.readiness?.tcpPort" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.readiness.tcpPort}}"></i>TCP Port</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Probes not included if not set" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-rpTcpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.tcpPort"
+                                    #rpTcpPort="ngModel" [ngClass]="{'is-invalid': submitted && rpTcpPort.invalid}" />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 1 and max Value is 65535
+                                </div>
+                            </div>
+                            <div class="form-row" *ngIf="container.containerAdvancedOptions.httpService">
+                                <div class="col">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                                    *ngIf="containerDescription?.readiness?.httpPath"
+                                                    [autoClose]="'outside'"
+                                                    ngbPopover="{{containerDescription.readiness.httpPath}}"></i>HTTP
+                                                Path</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Probes not included if not set" name="{{container.uniqueName }}-rpHttpPath" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpAction" #rphttpAction="ngModel" [ngClass]="{'is-invalid': submitted && rphttpAction.invalid}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                                    *ngIf="containerDescription?.readiness?.httpPort"
+                                                    [autoClose]="'outside'"
+                                                    ngbPopover="{{containerDescription.readiness.httpPort}}"></i>HTTP
+                                                Port</span>
+                                        </div>
+                                        <input type="number" class="form-control" placeholder="Defaults to: 80" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-rpHttpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpPort" #rpHttpPort="ngModel"
+                                            [ngClass]="{'is-invalid': submitted && rpHttpPort.invalid}" />
+                                        <div class="invalid-feedback">
+                                            Minimum Value is 1 and max Value is 65535
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col" *ngIf="container.containerAdvancedOptions.livenessProbe">
+                            <div class="row mb-2">
+                                <div class="col my-auto">
+                                    <h5 class="my-auto text-center">Liveness Check</h5>
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-lInitialThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.initial"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.initial}}"></i>Start Checking
+                                    After:
+                                    {{container.containerAdvancedOptions.livenessProbe.initialDelaySeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-lInitialThreshold'}}" name="{{container.uniqueName + '-lInitialThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.initialDelaySeconds" min="0" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-lPeriodSeconds'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.period"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.period}}"></i>Check Interval:
+                                    {{container.containerAdvancedOptions.livenessProbe.periodSeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-lPeriodSeconds'}}" name="{{container.uniqueName + '-lPeriodSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.periodSeconds" min="1" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-lSuccessThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.success"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.success}}"></i>Healthy After:
+                                    {{container.containerAdvancedOptions.livenessProbe.successThreshold}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-lSuccessThreshold'}}" name="{{container.uniqueName + '-lSuccessThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.successThreshold" min="1" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="{{container.uniqueName + '-lTimeoutSeconds'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.timeout"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.timeout}}"></i>Check Timeout:
+                                    {{container.containerAdvancedOptions.livenessProbe.timeoutSeconds}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-lTimeoutSeconds'}}" name="{{container.uniqueName + '-lTimeoutSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.timeoutSeconds" min="1" max="100">
+                            </div>
+                            <div class="input-group mb-2">
+                                <label for="{{container.uniqueName + '-lFailureThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.failure"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.failure}}"></i>Unhealthy After:
+                                    {{container.containerAdvancedOptions.livenessProbe.failureThreshold}}</label>
+                                <input type="range" class="custom-range" id="{{container.uniqueName + '-lFailureThreshold'}}" name="{{container.uniqueName + '-lFailureThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.failureThreshold" min="1" max="100">
+                            </div>
+                            <div class="input-group mb-2" *ngIf="!container.containerAdvancedOptions.httpService">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.liveness?.tcpPort" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.liveness.tcpPort}}"></i>TCP Port</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Probes not included if not set" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-lTcpPort" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.tcpPort"
+                                    #lTcpPort="ngModel" [ngClass]="{'is-invalid': submitted && lTcpPort.invalid}" />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 1 and max Value is 65535
+                                </div>
+                            </div>
+                            <div class="form-row" *ngIf="container.containerAdvancedOptions.httpService">
+                                <div class="col">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                                    *ngIf="containerDescription?.liveness?.httpPath"
+                                                    [autoClose]="'outside'"
+                                                    ngbPopover="{{containerDescription.liveness.httpPath}}"></i>HTTP
+                                                Path</span>
+                                        </div>
+                                        <input type="text" class="form-control" placeholder="Probes not included if not set" name="{{container.uniqueName }}-lHttpPath" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.httpAction" #lhttpAction="ngModel" [ngClass]="{'is-invalid': submitted && lhttpAction.invalid}"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="input-group mb-2">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="test"><i class="fas fa-info-circle mr-1"
+                                                    *ngIf="containerDescription?.liveness?.httpPort"
+                                                    [autoClose]="'outside'"
+                                                    ngbPopover="{{containerDescription.liveness.httpPort}}"></i>HTTP
+                                                Port</span>
+                                        </div>
+                                        <input type="number" class="form-control" placeholder="Defaults to: 80" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-lHttpPort" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.httpPort" #lHttpPort="ngModel"
+                                            [ngClass]="{'is-invalid': submitted && lHttpPort.invalid}" aria-describedby="test" />
+                                        <div class="invalid-feedback">
+                                            Minimum Value is 1 and max Value is 65535
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col my-auto">
+                            <h4 class="my-auto">Requests/Limits</h4>
+                        </div>
+                        <div class="col my-auto">
+                            <button type="button" class="btn bg-transpartent float-right p-0" style="color: grey;" (click)="container.containerAdvancedOptions.setStandardValues()">Set Limits/Defaults to
+                                Standard Values</button>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <h5 class="text-center my-auto">Requests</h5>
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.requests?.cpu" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.requests.cpu}}"></i>CPU
+                                        Request</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Defaults to: 0.1" step="0.005" min="0.005" customMin="0.005" name="{{container.uniqueName }}-rCpu" [(ngModel)]="container.containerAdvancedOptions.requests.cpu" #rCPU="ngModel" [ngClass]="{'is-invalid': submitted && rCPU.invalid}"
+                                />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 0.005 and must be lower than CPU Limit
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.requests?.memory" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.requests.memory}}"></i>Memory
+                                        Request(MB)</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Defaults to: 256Mi" min="4" customMin="4" name="{{container.uniqueName }}-rMemory" [(ngModel)]="container.containerAdvancedOptions.requests.memory" #rMemory="ngModel" [ngClass]="{'is-invalid': submitted && rMemory.invalid}"
+                                />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 4 and must be lower than Memory Limit
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="row mb-2">
+                                <div class="col">
+                                    <h5 class="text-center my-auto">Limits</h5>
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.limits?.cpu" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.limits.cpu}}"></i>CPU
+                                        Limit</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Defaults to: 0.1" step="0.005" min="{{container.containerAdvancedOptions.requests.cpu || 0.005}}" customMin="{{container.containerAdvancedOptions.requests.cpu || 0.005}}" name="{{container.uniqueName }}-lCpu"
+                                    [(ngModel)]="container.containerAdvancedOptions.limits.cpu" #lCPU="ngModel" [ngClass]="{'is-invalid': submitted && lCPU.invalid}" />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 0.005 and must be higher or equal than cpu request
+                                </div>
+                            </div>
+                            <div class="input-group mb-2">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                            *ngIf="containerDescription?.limits?.memory" [autoClose]="'outside'"
+                                            ngbPopover="{{containerDescription.limits.memory}}"></i>Memory
+                                        Limit(MB)</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Defaults to: 256Mi" min="{{container.containerAdvancedOptions.requests.memory || 4}}" customMin="{{container.containerAdvancedOptions.requests.memory || 4}}" name="{{container.uniqueName }}-lMemory"
+                                    [(ngModel)]="container.containerAdvancedOptions.limits.memory" #lMemory="ngModel" [ngClass]="{'is-invalid': submitted && lMemory.invalid}" />
+                                <div class="invalid-feedback">
+                                    Minimum Value is 4 and must be higher or equal than memory request
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h4>Init Containers</h4>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-block" (click)="container.containerAdvancedOptions.addInitContainer()">Add Init
+                                Container</button>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2" *ngFor="let initContainer of container.containerAdvancedOptions.initContainers" [@enterAnimation]>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Command*</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Command" [(ngModel)]="initContainer.command" name="{{initContainer.uniqueName}}-command" #initCommand="ngModel" [ngClass]="{'is-invalid': submitted && initCommand.invalid}" required>
+                                <div class="invalid-feedback">
+                                    Command must be set!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">MountPath</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Absolute MountPath" [(ngModel)]="initContainer.mountPath" name="{{initContainer.uniqueName}}-mountPath" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #initMount="ngModel" [ngClass]="{'is-invalid': submitted && initMount.invalid}">
+                                <div class="invalid-feedback">
+                                    Path must be an absolute path
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto my-auto">
+                            <div class="custom-control custom-checkbox my-auto">
+                                <input type="checkbox" class="custom-control-input" name="{{initContainer.uniqueName + '-privileged'}}" id="{{initContainer.uniqueName + '-privileged'}}" [(ngModel)]="initContainer.privileged">
+                                <label class="custom-control-label" for="{{initContainer.uniqueName + '-privileged'}}">Privileged</label>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary float-right" (click)="container.containerAdvancedOptions.deleteInitContainer(initContainer)"><i
+                                    class="fas fa-trash-alt" title="Delete"></i></button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

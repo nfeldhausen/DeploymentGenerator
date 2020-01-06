@@ -1,0 +1,63 @@
+---
+apiVersion: "apps/v1"
+kind: "Deployment"
+metadata:
+  name: "frontend"
+  labels:
+    app: "frontend"
+    tier: "frontend"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "frontend"
+      tier: "frontend"
+  template:
+    metadata:
+      labels:
+        app: "frontend"
+        tier: "frontend"
+    spec:
+      containers:
+        - image: "nfeldhausen/frontend"
+          name: "frontend"
+          env:
+            - name: "API_BACKEND"
+              value: "backend:8080"
+          ports:
+            - containerPort: 80
+              protocol: "TCP"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "frontend"
+  labels:
+    app: "frontend"
+    tier: "frontend"
+spec:
+  ports:
+    - name: "html"
+      port: 80
+      protocol: "TCP"
+  selector:
+    app: "frontend"
+    tier: "frontend"
+  type: "ClusterIP"
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "frontend-external"
+  labels:
+    app: "frontend"
+    tier: "frontend"
+spec:
+  ports:
+    - name: "html"
+      port: 80
+      protocol: "TCP"
+  selector:
+    app: "frontend"
+    tier: "frontend"
+  type: "NodePort"
