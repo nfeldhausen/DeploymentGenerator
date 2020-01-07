@@ -115,7 +115,7 @@ The chart below contains all important folders and files for further development
 generator-frontend
 ├── src									# Containes all HTML Template files
 │	├── app
-│	│	├── advanced					# Contains all HTML Templates of the advanced TAB
+│	│   ├── advanced					# Contains all HTML Templates of the advanced TAB
 │	│   ├── animations					# Contains all used animations
 │	│   ├── directives					# Contains all used directives
 │	│   ├── error-modal					# Contains the error modal used in the advanced TAB
