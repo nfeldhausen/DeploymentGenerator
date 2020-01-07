@@ -1,4 +1,4 @@
-### Structure# Deployment Generator
+# Deployment Generator
 
 This repository contains source code for the generator frontend and for the generator backend. Also it includes the Dockerfiles for building the Docker Images.
 
@@ -101,6 +101,7 @@ return [];
 ```bash
 $ npm start
 ```
+5. The frontend should be accessible via http://localhost:4200.
 
 ### Setting backend endpoint
 This frontend tunnels all traffic from the client to the backend to the backend, because this is necessary for the Docker Images to work properly.  
