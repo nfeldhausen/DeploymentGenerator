@@ -113,23 +113,23 @@ If you want to address new service endpoints, add a corresponding entry to the *
 The chart below contains all important folders and files for further development.
 ```
 generator-frontend
-├── src									# Containes all HTML Template files
-│	├── app
-│	│   ├── advanced					# Contains all HTML Templates of the advanced TAB
-│	│   ├── animations					# Contains all used animations
-│	│   ├── directives					# Contains all used directives
-│	│   ├── error-modal					# Contains the error modal used in the advanced TAB
-│	│   ├── model						# Contains all used models
-│	│   ├── result						# Contains all HTML Templates of the result page
-│	│   ├── services					# Contains all services
-│	│   ├── template					# Contains all HTML Templates of the templates TAB
-│	│   ├── welcome						# Contains all HTML Templates ot the welcome TAB
-│	│   ├── wizard						# Contains all HTMLTemplates of the wizard TAB
-│	│   ├── app-routing.module.ts		# Contains app routing (router links etc.)
-│	│   ├── app.component.html			# HTML Template file of the app
-│	│   └── app.module.ts				# Contains imports of all used imports etc.
-│	└── index.html						# Main HTML Template (Contains body etc.)
-└── proxy.conf.json						# Contains all entries to proxy requests to the backend
+├── src                                 # Contains all HTML Template files
+│   ├── app
+│   │   ├── advanced                    # Contains all HTML Templates of the advanced TAB
+│   │   ├── animations                  # Contains all used animations
+│   │   ├── directives                  # Contains all used directives
+│   │   ├── error-modal                 # Contains the error modal used in the advanced TAB
+│   │   ├── model                       # Contains all used models
+│   │   ├── result                      # Contains all HTML Templates of the result page
+│   │   ├── services                    # Contains all services
+│   │   ├── template                    # Contains all HTML Templates of the templates TAB
+│   │   ├── welcome                     # Contains all HTML Templates ot the welcome TAB
+│   │   ├── wizard                      # Contains all HTMLTemplates of the wizard TAB
+│   │   ├── app-routing.module.ts       # Contains app routing (router links etc.)
+│   │   ├── app.component.html          # HTML Template file of the app
+│   │   └── app.module.ts               # Contains imports of all used imports etc.
+│   └── index.html                      # Main HTML Template (Contains body etc.)
+└── proxy.conf.json                     # Contains all entries to proxy requests to the backend
 ```
 
 
@@ -158,16 +158,16 @@ The chart below contains all important folders and files for further development
 ```
 generator-backend
 ├── src
-│	└── main
-│   	├── java/de.th.bingen.master.backend
-│       │	├── configuration					# Contains configuration files for the backend
-│       │   ├── controller						# Contains all controllers
-│       │   ├── helper							# Contains helper classes
-│       │   ├── model							# Contains the Kubernetes model aswell as the request/response models
-│       │   ├── services						# Contains all services 
-│       │   └── BackendApplication.java			# Main class of the backend
+│   └── main
+│       ├── java/de.th.bingen.master.backend
+│       │   ├── configuration                   # Contains configuration files for the backend
+│       │   ├── controller                      # Contains all controllers
+│       │   ├── helper                          # Contains helper classes
+│       │   ├── model                           # Contains the Kubernetes model aswell as the request/response models
+│       │   ├── services                        # Contains all services 
+│       │   └── BackendApplication.java         # Main class of the backend
 │       └── resources
-│       	├── kubernetesTemplates 			# Contains all templates
-│           └── application.yaml				# Contains configuration for databases and the default Docker Host
-└── pom.xml										# Contains definition of maven dependencies
+│           ├── kubernetesTemplates             # Contains all templates
+│           └── application.yaml                # Contains configuration for databases and the default Docker Host
+└── pom.xml                                     # Contains definition of maven dependencies
 ```
