@@ -14,16 +14,8 @@
                                 <i class="fas fa-info-circle fa-3x my-auto"></i>
                             </div>
                             <div class="col">
-                                <p class="card-text text-justify">This list lists all containers/databases/links you
-                                    created. To
-                                    modify an existing
-                                    container/database/link just click the names. If you want to delete a single
-                                    container/database/link click
-                                    the Trash Icon next to it. If you want to add something click the add Button and
-                                    select
-                                    what
-                                    you want to
-                                    add. To add a link you have to add a container or database first!</p>
+                                <p class="card-text text-justify">This list lists all containers/databases/links you created. To modify an existing container/database/link just click the names. If you want to delete a single container/database/link click the Trash Icon next to it. If
+                                    you want to add something click the add Button and select what you want to add. To add a link you have to add a container or database first!</p>
                             </div>
                         </div>
                     </div>
@@ -39,8 +31,7 @@
             <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="w-100">
                 <button ngbDropdownItem (click)="addContainer()">Container</button>
                 <button ngbDropdownItem (click)="addDatabase()">Database</button>
-                <button ngbDropdownItem (click)="addLink()"
-                    *ngIf="request.containers.length !== 0 || request.databases.length !== 0">Link</button>
+                <button ngbDropdownItem (click)="addLink()" *ngIf="request.containers.length !== 0 || request.databases.length !== 0">Link</button>
             </div>
         </div>
     </div>
@@ -49,7 +40,7 @@
     <!--Containers-->
     <div class="form-row mb-2" *ngFor="let container of request.containers" [@fastEnterAnimation]>
         <div class="col">
-            <button type="button" class="btn btn-success btn-block" (click)="editContainer(container)">Edit Container
+            <button type="button" class="btn btn-primary btn-block" (click)="editContainer(container)" style="background-color: #1F45FC;">Edit Container
                 {{container.name}}</button>
         </div>
         <div class="col-auto">
@@ -60,7 +51,7 @@
     <!--Databases-->
     <div class="form-row mb-2" *ngFor="let database of request.databases" [@fastEnterAnimation]>
         <div class="col">
-            <button type="button" class="btn btn-warning btn-block" (click)="editDatabase(database)">Edit Database
+            <button type="button" class="btn btn-primary btn-block" (click)="editDatabase(database)" style="background-color: #6F95FF;">Edit Database
                 {{database.name}}</button>
         </div>
         <div class="col-auto">
@@ -71,8 +62,7 @@
     <!--Links-->
     <div class="form-row mb-2" *ngFor="let link of request.links" [@fastEnterAnimation]>
         <div class="col">
-            <button type="button" class="btn btn-info btn-block"
-                (click)="editLink(link)">{{getLinkDescription(link)}}</button>
+            <button type="button" class="btn btn-primary btn-block" (click)="editLink(link)" style="background-color: #BFE5FF;">{{getLinkDescription(link)}}</button>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-secondary" (click)="deleteLink(link)"><i class="fas fa-trash-alt"
@@ -81,10 +71,7 @@
     </div>
     <div class="row mb-2">
         <div class="col">
-            <button type="button" class="btn btn-primary btn-block" (click)="submit()"
-                [disabled]="request.containers.length === 0 && request.databases.length === 0"
-                ngbTooltip="Nothing to submit - Add a container or database first"
-                [disableTooltip]="request.containers.length !== 0 || request.databases.length !== 0">Submit</button>
+            <button type="button" class="btn btn-primary btn-block" (click)="submit()" [disabled]="request.containers.length === 0 && request.databases.length === 0" ngbTooltip="Nothing to submit - Add a container or database first" [disableTooltip]="request.containers.length !== 0 || request.databases.length !== 0">Submit</button>
         </div>
     </div>
 </div>

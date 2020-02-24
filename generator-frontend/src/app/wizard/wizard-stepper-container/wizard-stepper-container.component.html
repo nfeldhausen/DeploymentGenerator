@@ -68,6 +68,10 @@
         </form>
     </aw-wizard-step>
 
+
+
+
+
     <aw-wizard-step [canExit]="storageForm.valid || moveBackwards" (stepEnter)="resetForm(storageForm)" stepTitle="Storage">
         <ngx-spinner bdColor="rgba(51,51,51,0.5)" size="medium" color="#FFF" type="ball-spin-clockwise-fade">
             <p style="font-size: 20px; color: white">Analyzing Image...</p>
@@ -101,12 +105,10 @@
                     </a>
                 </div>
             </div>
+
             <div class="row mb-2">
                 <div class="col">
-                    <p class="m-0 text-justify"><b>Does your container store all it's important data in a database or does not
-                        require
-                        to store any
-                        data?</b><span *ngIf="container.analysis?.mountPaths?.length"> Your container got {{container.analysis.mountPaths.length}} Mount Paths and thus may store persistent data!</span>
+                    <p class="m-0 text-justify"><b>Does your container store all it's important data in a database?</b><span *ngIf="container.analysis?.mountPaths?.length"> Your container got {{container.analysis.mountPaths.length}} Mount Paths and thus may store persistent data!</span>
                         <span *ngIf="container.analysis && !container.analysis?.mountPaths?.length"> Your container seems not to store any important data on the node.</span></p>
                 </div>
             </div>
@@ -122,7 +124,6 @@
                     </div>
                 </div>
             </div>
-
             <!--Container stores data in database-->
             <div *ngIf="container.wizardOptions.databaseStore" [@enterAnimation]>
                 <div class="row mb-1">
@@ -176,123 +177,145 @@
 
             <!--Container does not store data in database-->
             <div *ngIf="container.wizardOptions.databaseStore === false" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".databaseStoreCollapse">
-                            <div class="card border-dark">
-                                <div class="databaseStoreCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Persistent Storage Information
-                                    </div>
-                                </div>
-                                <div class="databaseStoreCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">Your container does not store all it's important data in a database. If your container still needs to store any data, which has to be persistent (e.g. if you want to create a database yourself), add persistent
-                                                    storage below. For simplicity reasons there will be one persistent storage (or in Kubernetes one PVC) per mount point.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>Set the absolute mount path and a desired size for every storage you
-                            create.</b></p>
-                    </div>
-                </div>
-                <div class="form-row mb-2">
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" (click)="container.addStorage()">Add
-                        Storage</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" [disabled]="!container.analysis?.mountPaths?.length" (click)="appendMountPathsFromImage()">Get Mount Points from Image</button>
-                    </div>
-                </div>
-                <div class="form-row mb-2" *ngFor="let storage of container.storage" [@fastEnterAnimation]>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Path*</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Absolute Mount Path" [(ngModel)]="storage.storageMounts[0].mountPath" name="{{storage.uniqueName}}-path" required pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #path="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && path.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required and must be absolute
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Size*</span>
-                            </div>
-                            <input type="number" class="form-control" placeholder="Size in Mb" min="1" customMin="1" [(ngModel)]="storage.size" name="{{storage.uniqueName}}-size" required #size="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && size.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required and must be a positive number
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-secondary" (click)="container.deleteStorage(storage)"><i
-                            class="fas fa-trash-alt" title="Delete"></i></button>
-                    </div>
-                </div>
-                <!--Authorize Replicas-->
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".scaleCollapse">
-                            <div class="card border-dark">
-                                <div class="scaleCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Replica Information
-                                    </div>
-                                </div>
-                                <div class="scaleCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">
-                                                    It may be possible that your container is not scaleable anymore. If you still need more instances of your container than one and you know what you are doing it is possible to scale the container.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
+                <!--Does not store everything in a database-->
                 <div class="row mb-2">
                     <div class="col">
-                        <p class="m-0 text-justify">
-                            <b>Do you want to scale your container despite being a stateful application?</b>
-                        </p>
+                        <p class="m-0 text-justify"><b>Does your container have to store important data?</b><span *ngIf="container.analysis?.mountPaths?.length"> Your container got {{container.analysis.mountPaths.length}} Mount Paths and thus may store persistent data!</span>
+                            <span *ngIf="container.analysis && !container.analysis?.mountPaths?.length"> Your container seems not to store any important data on the node.</span></p>
                     </div>
                 </div>
                 <div class="row pl-3 mb-2">
                     <div class="col">
                         <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="authorizeScaleYes" name="authorizeScale" [value]="true" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
-                            <label class="custom-control-label" for="authorizeScaleYes">Yes</label>
+                            <input type="radio" class="custom-control-input" id="storesDataYes" name="storesData" [value]="true" [(ngModel)]="container.wizardOptions.storesData" (ngModelChange)="resetStorage()" required #storesData="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && storesData.invalid}">
+                            <label class="custom-control-label" for="storesDataYes">Yes</label>
                         </div>
                         <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="authorizeScaleNo" name="authorizeScale" [value]="false" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
-                            <label class="custom-control-label" for="authorizeScaleNo">No</label>
+                            <input type="radio" class="custom-control-input" id="storesDataNo" name="storesData" [value]="false" [(ngModel)]="container.wizardOptions.storesData" (ngModelChange)="resetStorage()" required #storesData="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && storesData.invalid}">
+                            <label class="custom-control-label" for="storesDataNo">No</label>
                         </div>
                     </div>
                 </div>
-                <div *ngIf="container.wizardOptions.authorizeScale" [@enterAnimation]>
+
+                <div *ngIf="container.wizardOptions.storesData" [@enterAnimation]>
+                    <div class="row mb-1">
+                        <div class="col">
+                            <a data-toggle="collapse" data-target=".databaseStoreCollapse">
+                                <div class="card border-dark">
+                                    <div class="databaseStoreCollapse collapse">
+                                        <div class="card-header">
+                                            <i class="fas fa-info-circle my-auto mr-1"></i> Persistent Storage Information
+                                        </div>
+                                    </div>
+                                    <div class="databaseStoreCollapse collapse show">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-auto my-auto">
+                                                    <i class="fas fa-info-circle fa-3x my-auto"></i>
+                                                </div>
+                                                <div class="col">
+                                                    <p class="card-text text-justify">Your container does not store all it's important data in a database. If your container still needs to store any data, which has to be persistent (e.g. if you want to create a database yourself), add
+                                                        persistent storage below. For simplicity reasons there will be one persistent storage (or in Kubernetes one PVC) per mount point.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <p class="m-0 text-justify"><b>Set the absolute mount path and a desired size for every storage you
+                            create.</b></p>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2">
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-block" (click)="container.addStorage()">Add
+                        Storage</button>
+                        </div>
+                        <div class="col">
+                            <button type="button" class="btn btn-primary btn-block" [disabled]="!container.analysis?.mountPaths?.length" (click)="appendMountPathsFromImage()">Get Mount Points from Image</button>
+                        </div>
+                    </div>
+                    <div class="form-row mb-2" *ngFor="let storage of container.storage" [@fastEnterAnimation]>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Path*</span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Absolute Mount Path" [(ngModel)]="storage.storageMounts[0].mountPath" name="{{storage.uniqueName}}-path" required pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #path="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && path.invalid}">
+                                <div class="invalid-feedback">
+                                    This field is required and must be absolute
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Size*</span>
+                                </div>
+                                <input type="number" class="form-control" placeholder="Size in Mb" min="1" customMin="1" [(ngModel)]="storage.size" name="{{storage.uniqueName}}-size" required #size="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && size.invalid}">
+                                <div class="invalid-feedback">
+                                    This field is required and must be a positive number
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <button type="button" class="btn btn-secondary" (click)="container.deleteStorage(storage)"><i
+                            class="fas fa-trash-alt" title="Delete"></i></button>
+                        </div>
+                    </div>
+                    <div class="row mb-1">
+                        <div class="col">
+                            <a data-toggle="collapse" data-target=".scaleCollapse">
+                                <div class="card border-dark">
+                                    <div class="scaleCollapse collapse">
+                                        <div class="card-header">
+                                            <i class="fas fa-info-circle my-auto mr-1"></i> Replica Information
+                                        </div>
+                                    </div>
+                                    <div class="scaleCollapse collapse show">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-auto my-auto">
+                                                    <i class="fas fa-info-circle fa-3x my-auto"></i>
+                                                </div>
+                                                <div class="col">
+                                                    <p class="card-text text-justify">
+                                                        It may be possible that your container is not scaleable anymore. If you still need more instances of your container than one and you know what you are doing it is possible to scale the container.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col">
+                            <p class="m-0 text-justify">
+                                <b>Do you want to scale your container despite being a stateful application?</b>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row pl-3 mb-2">
+                        <div class="col">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="authorizeScaleYes" name="authorizeScale" [value]="true" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
+                                <label class="custom-control-label" for="authorizeScaleYes">Yes</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" class="custom-control-input" id="authorizeScaleNo" name="authorizeScale" [value]="false" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
+                                <label class="custom-control-label" for="authorizeScaleNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Authorize Replicas-->
+                <div *ngIf="container.wizardOptions.authorizeScale || container.wizardOptions.storesData === false" [@enterAnimation]>
                     <div class="row">
                         <div class="col">
                             <p class="m-0 text-justify"><b>Set the amount of desired instances of your container</b></p>
@@ -330,6 +353,9 @@
             </div>
         </form>
     </aw-wizard-step>
+
+
+
 
 
 

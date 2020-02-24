@@ -74,7 +74,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text">Size*</span>
                 </div>
-                <input type="number" class="form-control" placeholder="Size" name="dbSize" [(ngModel)]="database.size" min="1" customMin="1" required #size="ngModel" [ngClass]="{'is-invalid': submitted && size.invalid}">
+                <input type="number" class="form-control" placeholder="Size in Mb" name="dbSize" [(ngModel)]="database.size" min="1" customMin="1" required #size="ngModel" [ngClass]="{'is-invalid': submitted && size.invalid}">
                 <div class="invalid-feedback">
                     This field is required and must be a positive number
                 </div>

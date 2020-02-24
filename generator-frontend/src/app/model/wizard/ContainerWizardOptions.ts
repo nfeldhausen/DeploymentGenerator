@@ -5,6 +5,9 @@ export class ContainerWizardOptions {
     /** Whether the container stores all its data in a database or not */
     databaseStore: boolean;
 
+    /** Wheter the container stores persitent data */
+    storesData: boolean;
+
     /** Whether the user authorizes scaling despite being a stateful container */
     authorizeScale: boolean;
 
