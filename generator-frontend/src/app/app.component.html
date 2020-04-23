@@ -1,20 +1,88 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<header>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background-color: #385189;">
-        <a routerLink="/welcome" class="navbar-brand"><img src="https://seeklogo.com/images/K/kubernetes-logo-3A67038EAB-seeklogo.com.png" width="30" height="30" /> Kubernetes Deployment Generator</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" routerLink="/welcome" routerLinkActive="active">Welcome</a>
-                <a class="nav-item nav-link" routerLink="/wizard" routerLinkActive="active">Wizard</a>
-                <a class="nav-item nav-link" routerLink="/template" routerLinkActive="active">Templates</a>
-                <a class="nav-item nav-link" routerLink="/advanced" routerLinkActive="active">Advanced Mode</a>
-            </div>
+
+    
+<clr-main-container class="main-container" >
+    <clr-header class="header-5">
+        <div class="branding">
+            <a routerLink="/welcome" class="nav-link"><img src="https://seeklogo.com/images/K/kubernetes-logo-3A67038EAB-seeklogo.com.png" width="30" height="30" />&nbsp; &nbsp; <span class="title">Kubernetes Deployment Generator</span>  &nbsp; </a>
+    
         </div>
-    </nav>
-</header>
-<div class="container-xl">
-    <router-outlet></router-outlet>
-</div>
+    
+      
+    
+        <div class="header-actions">
+            <a href="javascript://" class="nav-link nav-icon-text">
+                <clr-icon shape="user" class="is-solid"></clr-icon>
+                
+            </a>
+            <a href="..." class="nav-link nav-icon" aria-label="settings">
+                <clr-icon shape="cog" class="is-solid"></clr-icon>
+            </a>
+            
+        </div>
+    
+    </clr-header>
+    <div class="content-container" >
+
+
+        <clr-vertical-nav class="vertNavBar" >
+         
+        
+            <a routerLink="/welcome" class="navElt"  routerLinkActive="active">
+                <span mat-line class="center"><clr-icon shape="home" class="is-solid" size="32"></clr-icon></span>
+                <span mat-line class="center">Home</span>
+            </a>
+            <div class="nav-divider"></div>
+            <a mat-list-item  routerLink="/wizard"  class="navElt"  routerLinkActive="active">
+                <span mat-line class="center"><clr-icon shape="tools" class="is-solid" size="32"></clr-icon></span>
+            <span mat-line class="center">Wizard</span>
+            </a>    
+            <div class="nav-divider"></div>
+            <a mat-list-item  routerLink="/template"  class="navElt" routerLinkActive="active" >
+                <span mat-line class="center"><clr-icon shape="file-group" class="is-solid" size="32"></clr-icon></span>
+                <span mat-line class="center">Templates</span>
+            </a>         
+            <div class="nav-divider"></div>
+            <a mat-list-item routerLink="/advanced" class="navElt" routerLinkActive="active" >
+                <span mat-line class="center"><clr-icon shape="wrench" class="is-solid" size="32"></clr-icon></span>
+                <span mat-line class="center">Advanced Mode </span>
+                
+            </a>       
+            
+            <a mat-list-item routerLinkActive="active" routerLink="/help" class="navElt" style=" bottom: 0; position:absolute; margin:15px; "  >
+                <span mat-line class="center"><clr-icon shape="help" class="is-solid" size="25"></clr-icon></span>
+                <span mat-line class="center">Help</span>
+                
+            </a>
+            
+        </clr-vertical-nav>
+
+        <!-- <clr-vertical-nav  [clrVerticalNavCollapsible]="true" class="nav-trigger--bottom vertNavBar"  [(clrVerticalNavCollapsed)]="collapsed">
+            
+            <a clrVerticalNavLink  routerLink="/welcome" class="navElt"  routerLinkActive="active">
+                <clr-icon shape="home" class="is-solid" size="50" clrVerticalNavIcon></clr-icon>
+                Home
+            </a>
+            <div class="nav-divider"></div>
+            <a clrVerticalNavLink   routerLink="/wizard"  class="navElt"  routerLinkActive="active">
+                <clr-icon shape="tools" class="is-solid" size="50" clrVerticalNavIcon></clr-icon>
+                Wizard
+            </a>
+            <div class="nav-divider"></div>
+            <a clrVerticalNavLink   routerLink="/template"  class="navElt" routerLinkActive="active" >
+                <clr-icon shape="file-group" class="is-solid" size="50" clrVerticalNavIcon></clr-icon>
+                Templates
+            </a>
+            <div class="nav-divider"></div>
+            <a clrVerticalNavLink   routerLink="/advanced"  class="navElt" routerLinkActive="active" >
+                <clr-icon shape="wrench" class="is-solid" size="50" clrVerticalNavIcon></clr-icon>
+                Advanced Mode
+            </a>
+
+        </clr-vertical-nav> -->
+   
+        <div class="content-area" style="background: #e4e4e4; padding-top: 0; ">
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</clr-main-container>
+  

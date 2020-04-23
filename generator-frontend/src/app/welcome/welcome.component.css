@@ -1,0 +1,40 @@
+.welcomeImage{
+    position: absolute;
+    top: 30%;
+    left: 45%;
+    font-size: 15px;
+    font-weight: 500;
+    transform: translate(-50%, -50%);
+
+
+    width: 500px;
+    height: 500px;
+    
+}
+
+
+.welcome{
+    position: absolute;
+    top: 70%;
+    left: 50%;
+    font-size: 15px;
+    font-weight: 500;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    
+}
+
+.welcomeButton{
+    position: absolute;
+    top: 79%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+}
+
+.img{
+    filter:  grayscale(20%);
+   
+    padding: 25%;
+    
+}

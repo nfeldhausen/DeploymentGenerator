@@ -1,72 +1,73 @@
-<div class="row mb-2">
-    <div class="col">
-        <button type="button" class="btn btn-primary" (click)="addLink()"><i class="fas fa-plus"></i> Add Link</button>
+<div class="addButton">
+  
+        <button type="button" class="btn btn-primary btn-block" (click)="addLink()"> <clr-icon shape="plus-circle" size="20"></clr-icon>&nbsp; Add
+            Link</button>
+
+</div>
+
+<div class="clr-row">
+    
+   
+
+    
+</div>
+
+<div class="clr-row title" *ngIf="request.links.length!=0">
+    
+    <div  class="clr-col-11">
+        <h1 > Links </h1>
+        
+    </div>
+    
+</div>
+<div class="card container clr-row" *ngFor="let link of request.links">
+
+    <mat-divider></mat-divider>
+    <div class="clr-col-10">
+        
+       
+        <mat-form-field >
+            <mat-label><b>Name</b> </mat-label>
+            <input type="text" matInput [(ngModel)]="link.name" placeholder="Name" name="{{link.uniqueName + '-name'}}" #lname="ngModel" [ngClass]="{'is-invalid': submitted && lname.invalid}" required />
+            <mat-hint>Link name can not be empty</mat-hint>
+        </mat-form-field>        
+
+        
+        <mat-form-field >
+            <mat-label><b>Scheme</b> </mat-label>
+            <input type="text" matInput  [(ngModel)]="link.scheme" placeholder="Change Default link variable scheme" name="{{link.uniqueName + '-scheme'}}" #lscheme="ngModel" pattern="^.*<link>.*$" [ngClass]="{'is-invalid': submitted && lscheme.invalid}"
+            />
+            <mat-hint> Link scheme has to contain which will be replaced with the service name</mat-hint>
+        </mat-form-field>      
+
+
+        <mat-form-field >
+            <mat-label>From Container </mat-label>
+            <select matNativeControl [(ngModel)]="link.containerFrom" placeholder="From Container" name="{{link.uniqueName + '-from'}}" #lfrom="ngModel" [ngClass]="{'is-invalid': submitted && lfrom.invalid}" required>
+                <option [ngValue]="container.uniqueName" *ngFor="let container of getAllContainer()">
+                    {{container.name}} ({{container.uniqueName}})</option>
+            </select>
+           
+            <mat-hint> Referenced Container can not be empty</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field >
+            <mat-label>To Container </mat-label>
+            <select matNativeControl [(ngModel)]="link.containerTo" placeholder="To Container" name="{{link.uniqueName + '-to'}}" #lto="ngModel" [ngClass]="{'is-invalid': submitted && lto.invalid}" required>
+                <option [ngValue]="container.uniqueName" *ngFor="let container of getAllContainer()">
+                    {{container.name}} ({{container.uniqueName}})</option>
+            </select>
+           
+            <mat-hint> Referenced Container can not be empty</mat-hint>
+        </mat-form-field>
+
+    </div>
+    <div class="clr-col-2">
+        <button class="btn btn-icon  btn-warning" style=" font-size: 20px;"  (click)="deleteLink(link)"><clr-icon shape="trash"></clr-icon></button>
+
     </div>
 </div>
-<div class="row mb-2 border border-dark p-2" *ngIf="request.links.length" [@enterAnimation]>
-    <div class="col">
-        <div class="row mb-2">
-            <div class="col my-auto">
-                <h2 class="font-weight-bold my-auto">Links</h2>
-            </div>
-        </div>
-        <div class="form-row mb-2" *ngFor="let link of request.links" [@enterAnimation]>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend" *ngVar="getLinkDescription(link.name, link.containerFrom) as linkDescription">
-                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
-                            *ngIf="linkDescription" [autoClose]="'outside'" ngbPopover="{{linkDescription.description}}"></i>Name*</span>
-                    </div>
-                    <input type="text" class="form-control" [(ngModel)]="link.name" placeholder="Name" name="{{link.uniqueName + '-name'}}" #lname="ngModel" [ngClass]="{'is-invalid': submitted && lname.invalid}" required />
-                    <div class="invalid-feedback">
-                        Link name can not be empty
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Scheme</span>
-                    </div>
-                    <input type="text" class="form-control" [(ngModel)]="link.scheme" placeholder="Change Default link variable scheme" name="{{link.uniqueName + '-scheme'}}" #lscheme="ngModel" pattern="^.*<link>.*$" [ngClass]="{'is-invalid': submitted && lscheme.invalid}"
-                    />
-                    <div class="invalid-feedback">
-                        Link scheme has to contain
-                        <link>, which will be replaced with the service name
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">From Container*</span>
-                    </div>
-                    <select class="custom-select" [(ngModel)]="link.containerFrom" placeholder="From Container" name="{{link.uniqueName + '-from'}}" #lfrom="ngModel" [ngClass]="{'is-invalid': submitted && lfrom.invalid}" required>
-                        <option [ngValue]="container.uniqueName" *ngFor="let container of getAllContainer()">
-                            {{container.name}} ({{container.uniqueName}})</option>
-                    </select>
-                    <div class="invalid-feedback">
-                        Referenced Container can not be empty
-                    </div>
-                </div>
-            </div>
-            <div class="col">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">To Container*</span>
-                    </div>
-                    <select class="custom-select" [(ngModel)]="link.containerTo" placeholder="To Container" name="{{link.uniqueName + '-to'}}" #lto="ngModel" [ngClass]="{'is-invalid': submitted && lto.invalid}" required>
-                        <option [ngValue]="container.uniqueName" *ngFor="let container of getAllContainer()">
-                            {{container.name}} ({{container.uniqueName}})</option>
-                    </select>
-                    <div class="invalid-feedback">
-                        Referenced Container can not be empty
-                    </div>
-                </div>
-            </div>
-            <div class="col-auto">
-                <button type="button" class="btn btn-secondary" (click)="deleteLink(link)"><i class="fas fa-trash-alt" title="Delete"></i></button>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
+

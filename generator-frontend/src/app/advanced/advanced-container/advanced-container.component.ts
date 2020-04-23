@@ -12,6 +12,7 @@ import { Storage } from '../../model/container/Storage';
 import { StorageMount } from '../../model/container/StorageMount';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { enterHeightAnimation } from '../../animations/animations';
+import {MatDialog, MatDialogModule, MatBottomSheet, MatBottomSheetRef} from '@angular/material'
 
 @Component({
   selector: 'app-advanced-container',
@@ -49,6 +50,8 @@ import { enterHeightAnimation } from '../../animations/animations';
  * Class which is necessary to render containers in advanced mode
  */
 export class AdvancedContainerComponent implements OnInit {
+  
+  
   /** The request for getting the list of containers */
   @Input()
   request: Request;
@@ -64,7 +67,7 @@ export class AdvancedContainerComponent implements OnInit {
   /** Subject for debouncing the input of the image field for triggering the image analysis */
   imageAnalysisSearch: Subject<any> = new Subject<any>();
 
-  constructor(private requestService: RequestService) { }
+  constructor(private requestService: RequestService, private _bottomSheet: MatBottomSheet) { }
 
   /**
    * Sets the action for the imageAnalysis Subjet for triggering the image analysis
@@ -369,4 +372,10 @@ export class AdvancedContainerComponent implements OnInit {
           }))
       )
     );
+    
+    openBottomSheet(Sheet : any): void {
+      this._bottomSheet.open(Sheet);
+    }
+    
+
 }

@@ -111,6 +111,8 @@ export class WizardStepperContainerComponent implements OnInit {
   @ViewChild('nameForm', {static: true})
   nameForm: NgForm;
 
+  xlOpen = true // For openning Clarity Wizard
+
   constructor(private requestService: RequestService, private spinner: NgxSpinnerService) { }
 
   /**
@@ -344,6 +346,10 @@ export class WizardStepperContainerComponent implements OnInit {
 
       this.wizard.reset();
       this.nameForm.reset();
+    }
+    if (this.submitType === 'START') 
+    {
+      this.mainWizardOptions.page = 'START';
     }
 
     if (this.submitType === 'RESULT') {

@@ -1,10 +1,111 @@
-<div class="row mb-2">
-    <div class="col">
-        <button type="button" class="btn btn-primary" (click)="addDatabase()"><i class="fas fa-plus"></i> Add
+<div class="addButton">
+ 
+        <button type="button" class="btn btn-primary btn-block" (click)="addDatabase()"> <clr-icon shape="plus-circle" size="20"></clr-icon>&nbsp;   Add
             Database</button>
-    </div>
+   
 </div>
-<div class="row p-2 border border-dark mb-2" *ngFor="let database of request.databases" [@enterAnimation]>
+
+
+<div class="clr-row container" *ngFor="let database of request.databases">
+
+    <div class="card clr-col">
+        <div class="clr-row">
+
+
+            <h1 class="clr-col-11">{{database.name}} Database</h1>
+
+            <h1 class="clr-col-1"><button class="btn btn-icon  btn-warning" style=" font-size: 20px;"  (click)="deleteDatabase(database)"><clr-icon shape="trash"></clr-icon></button></h1>
+        </div>
+        <mat-divider></mat-divider>
+
+        <small class="my-auto clr-col-12">ID: {{database.uniqueName}}</small><br>
+        <mat-form-field >
+            <mat-label><b>Name</b> </mat-label>
+            <input type="text" matInput pattern="([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]" [(ngModel)]="database.name" name="{{database.uniqueName + '-name'}}" #dbname="ngModel" [ngClass]="{'is-invalid': submitted && dbname.invalid}" required>
+            <mat-hint>Database name can not be empty</mat-hint>
+        </mat-form-field>
+
+
+
+        <mat-form-field >
+            <mat-label>Image </mat-label>
+            <select matNativeControl [(ngModel)]="database.image" name="{{database.uniqueName + '-image'}}" #dbimage="ngModel" (ngModelChange)="setEnvironmentsForDatabase(database)" [ngClass]="{'is-invalid': submitted && dbimage.invalid}" required>
+                <option *ngFor="let dbconfig of availableDatabases" [ngValue]="dbconfig.name">{{dbconfig.name}}</option>
+            </select>
+            <mat-hint>Database image can not be empty</mat-hint>
+
+
+        </mat-form-field>
+
+
+
+        <mat-form-field  >
+            <mat-label>Size</mat-label>
+            <input type="number" matInput [(ngModel)]="database.size" placeholder="Size in Mb" name="{{database.uniqueName + '-size'}}" #dbsize="ngModel" [ngClass]="{'is-invalid': submitted && dbsize.invalid}" required min="1" customMin="1" />
+            <mat-hint>Database size must be a number higher than 1</mat-hint>
+
+
+        </mat-form-field>
+
+        <mat-checkbox color="primary" id="{{database.uniqueName + '-expose'}}" name="{{database.uniqueName + '-expose'}}" [(ngModel)]=database.expose> Expose Database externally   </mat-checkbox>
+
+        <div *ngIf="database.expose">
+
+            <mat-form-field >
+                <mat-label>Service Type </mat-label>
+                <select matNativeControl [(ngModel)]="database.type" name="{{database.uniqueName + '-type'}}" #dbptype="ngModel" [ngClass]="{'is-invalid': submitted && dbptype.invalid}" required>
+                    <option>LoadBalancer</option>
+                    <option>NodePort</option>
+                </select>
+                <mat-hint>Database image can not be empty</mat-hint>
+
+
+            </mat-form-field>
+        </div>
+
+
+    </div>
+    
+    <div class="clr-col card" >
+
+        <div class="clr-row">
+            <h2 class="clr-col-11">Environment Variables</h2>
+            <div class="clr-col-1">
+
+            </div>
+        </div>
+        <mat-divider></mat-divider>
+
+        <div *ngFor="let variable of database.environments">
+   
+            <mat-form-field >
+                <mat-label>{{variable.name}}</mat-label>
+                <input type="text" matInput [(ngModel)]="variable.value" placeholder="Set or leave empty" name="{{database.uniqueName + '-' + variable.name}}" />
+            </mat-form-field>
+
+        </div>
+
+        <div *ngIf="!database.environments.length" class="clickable">
+
+            <br><br><br><br>
+            <p class="icon center"> <clr-icon shape="import" size="70" ></clr-icon></p>
+
+           <p class="text center">Environment variables will be automatically displayed here after choosing the image</p>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+<!-- <div class="row p-2 border border-dark mb-2" *ngFor="let database of request.databases" [@enterAnimation]>
     <div class="col">
         <div class="row mb-2">
             <div class="col-9">
@@ -85,4 +186,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

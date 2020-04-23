@@ -7,6 +7,7 @@ import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { enterHeightAnimation } from '../animations/animations';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-result',
@@ -98,7 +99,7 @@ export class ResultComponent implements OnInit {
   /** Endpoints of the deployment */
   deployEndpoints: Map<string, string[]>;
 
-  constructor(private requestService: RequestService) { }
+  constructor(private requestService: RequestService, public snackBar: MatSnackBar) { }
 
   /**
    * Initizalizes the Subject of the alertbox.
@@ -251,4 +252,10 @@ export class ResultComponent implements OnInit {
       this.deploySubject.next(`<i class="fas fa-times"></i> <b>Error!</b> ${response.message}`);
     }
   }
+  openSnackBar(message: string, action: string) 
+  {
+    this.snackBar.open(message, action, {
+       duration: 1200,
+    });
+ }
 }

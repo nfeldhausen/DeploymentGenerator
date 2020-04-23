@@ -1,0 +1,39 @@
+.card{
+    
+    border-radius: 8px;
+    border:none; 
+   
+    padding: 50px;
+    text-transform: uppercase;
+    text-align: center;
+    width: 220px;
+    height: 150px;
+    font-weight:650;
+     box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23); 
+}
+
+.container
+{
+ 
+    padding-right: 10% ;
+
+ 
+
+}
+
+.center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.start{
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-transform: uppercase;
+    font-weight: 600;
+
+}

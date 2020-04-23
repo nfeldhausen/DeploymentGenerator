@@ -1,3 +1,162 @@
+<form clrForm #mainForm="ngForm" clrLayout="vertical">
+
+<div class="clr-row center" *ngIf="mainWizardOptions.page === 'START'" [@enterAnimation]>
+    <div class="clr-col-lg-12 clr-col-12 ">
+        <div class="card">
+            <div class="card-header">
+                <h1>Wizard <img src="../../../assets/images/Illustration5.png" height="60" width="50"></h1>
+            </div>
+            <div class="card-block clr-row">
+               
+                <div class="card-text clr-col-8">
+                    <div class="card-title">
+                        <h3>Welcome information !</h3>
+                    </div>
+                    <p> 
+                         This wizard tries to help to deploy single containers or even microservice architectures on Kubernetes. The wizard uses some questions of the <b>Twelve-Factor App methodology</b> to determine the needs of the users
+                        application. At the end the wizard presents the user a deployable YAML file for Kubernets.
+                    </p>
+                    <p>
+                        During the wizard there exist no way to go back, but you can change settings at the summary at the end. If you require
+                    more information you can always click the info boxes for more information. All fields and questions you will see are mandatory and must be filled or answered. You should choose all names uniquely!
+                    </p>
+                    <br>
+
+                    <clr-alert  *ngIf="singleContainer.errors" [clrAlertType]="'danger'" [clrAlertClosable]="false">
+                        <clr-alert-item>
+                            <span class="alert-text">
+                                Please Answer the following Question !
+                            </span>
+                        </clr-alert-item>
+                    </clr-alert>
+                   
+                    <clr-radio-container clrInline>
+                        <label>
+                            Does your workload consist of more than one container, which have to
+                            communicate with each
+                            other? 
+                        </label>
+                        <clr-radio-wrapper>
+                          <input type="radio" clrRadio  id="singleContainerYes" name="singleContainer" [(ngModel)]="mainWizardOptions.singleContainer" [value]="true" #singleContainer="ngModel" required>
+                          <label>Yes</label>
+                        </clr-radio-wrapper>
+                        <clr-radio-wrapper>
+                          <input type="radio" clrRadio  id="singleContainerNo" name="singleContainer" [(ngModel)]="mainWizardOptions.singleContainer" [value]="false" required>
+                          <label>No</label>
+                        </clr-radio-wrapper>
+                        <clr-control-helper>If your workload consist of more than one container it is probably designed as a microservice architecture</clr-control-helper>
+                        <clr-control-error>This field is required!</clr-control-error>
+                      </clr-radio-container>
+                
+                      
+                   
+                      
+                </div>
+
+                <div class="clr-col">
+
+                    <ul class="clr-timeline  clr-timeline-vertical">
+                        <li class="clr-timeline-step disabled">
+                          <div class="clr-timeline-step-header">Welcome</div>
+                          <clr-icon shape="dot-circle" aria-current="true" aria-label="Current"></clr-icon>
+                          <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title">Information </span>
+                            <span class="clr-timeline-step-description">Read the information carefully <br> and click on the start button</span>
+                          </div>
+                        </li>
+                        <li class="clr-timeline-step">
+                          <div class="clr-timeline-step-header">Step 1</div>
+                          <clr-icon shape="circle" aria-label="Not started" ></clr-icon>
+                          <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title"> Container </span>
+                            <span class="clr-timeline-step-description">
+                                A modal dialog will open <br>  Read the information and fill in the corresponding fields
+                          <br>
+                            <div class="btn-group btn-sm">
+                            <button class="btn btn-sm disabled">Add </button>
+                            <button class="btn btn-sm disabled">Edit</button>
+                            </div>
+                        </span>
+                          </div>
+                        </li>
+                        <li class="clr-timeline-step">
+                            <div class="clr-timeline-step-header">Step 2</div>
+                            <clr-icon shape="circle" aria-label="Not started" ></clr-icon>
+                            <div class="clr-timeline-step-body">
+                              <span class="clr-timeline-step-title"> Database </span>
+                              <span class="clr-timeline-step-description">
+                                Read the information and fill in the corresponding fields
+                             <br>
+                            <div class="btn-group btn-sm">
+                            <button class="btn btn-sm disabled">Add </button>
+                            <button class="btn btn-sm disabled">Edit</button>
+                            </div>
+                          </span>
+                            </div>
+                          </li>
+                          <li class="clr-timeline-step">
+                            <div class="clr-timeline-step-header">Step 3</div>
+                            <clr-icon shape="circle" aria-label="Not started" ></clr-icon>
+                            <div class="clr-timeline-step-body">
+                              <span class="clr-timeline-step-title"> Link </span>
+                              <span class="clr-timeline-step-description">
+                                Read the information and fill in the corresponding fields 
+                           
+                          </span>
+                            </div>
+                          </li>
+                        <!-- <li class="clr-timeline-step">    Progress
+                          <div class="clr-timeline-step-header">Step 2</div>
+                          <clr-spinner clrMedium aria-label="In progress">Add Database </clr-spinner>
+                          <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title">Make vCenter trust KMS</span>
+                            <span class="clr-timeline-step-description">
+                         
+                        </span>
+                          </div>
+                        </li> -->
+                        <!-- <li class="clr-timeline-step">  Complete
+                          <div class="clr-timeline-step-header">Step 3</div>
+                          <clr-icon shape="success-standard" aria-label="Completed">Add Link</clr-icon>
+                          <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title">Make KMS trust vCenter</span>
+                            <span class="clr-timeline-step-description">Upload it to the KMS to complete the connection.
+                          <button class="btn btn-sm btn-link">Action</button>
+                        </span>
+                          </div>
+                        </li> -->
+                        <li class="clr-timeline-step">
+                          <div class="clr-timeline-step-header">Result</div>
+                          <clr-icon shape="circle" aria-label="Not started"></clr-icon>
+                          <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title">Connected</span>
+                            <span class="clr-timeline-step-description">Ready to deploy the YAML file</span>
+                          </div>
+                        </li>
+                        </ul>
+                </div>
+                
+            </div>
+            <div class="card-footer">
+
+                <div >
+                    <button type="submit" class="btn btn-primary"(click)="mainWizardOptions.page='STEPPER'" [disabled]="!mainForm.form.valid" >
+                        Start with the first
+                        container
+                    </button>
+                </div>
+                 
+               
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+</form>
+
+
+<!-- 
 <div *ngIf="mainWizardOptions.page === 'START'">
     <form #mainForm="ngForm">
         <div class="row mb-1">
@@ -6,7 +165,7 @@
                     <div class="card border-dark">
                         <div class="welcomeCollapse collapse">
                             <div class="card-header">
-                                <i class="fas fa-info-circle my-auto mr-1"></i>Welcome Information
+                                <i class="fas fa-info-circle my-auto mr-1"></i>
                             </div>
                         </div>
                         <div class="welcomeCollapse collapse show">
@@ -54,7 +213,7 @@
             </div>
         </div>
     </form>
-</div>
+</div> -->
 <div *ngIf="mainWizardOptions.page === 'STEPPER'">
     <app-wizard-stepper-container [mainWizardOptions]="mainWizardOptions" [request]="request"></app-wizard-stepper-container>
 </div>

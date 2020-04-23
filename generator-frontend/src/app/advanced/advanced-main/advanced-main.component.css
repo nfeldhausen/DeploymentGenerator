@@ -1,0 +1,111 @@
+:host ::ng-deep .mat-tab-body-wrapper {
+    flex-grow: 1;
+    display: grid;
+    height: 100%;
+  
+ 
+  }
+  ::ng-deep .mat-accent .mat-slider-thumb {
+    background-color: #0056ff;
+} 
+::ng-deep .mat-accent .mat-slider-thumb-label {
+    background-color: #0056ff;
+} 
+::ng-deep .mat-accent .mat-slider-track-fill {
+    background-color: #0056ff;
+} 
+.main-container{
+
+height: auto;
+}
+
+/* 
+.mat-tab-label {
+    min-width: 25px !important;
+    padding: 5px;
+    background-color: red;
+    color: red;
+    font-weight: 700;
+} */
+
+.mat-badge-content {
+    width: 20px;
+    height: 20px; 
+    line-height: 20px;
+    background-color: rgb(241, 97, 71);
+    border-radius: 5px;
+  
+  }
+  ::ng-deep .mat-tab-label{
+ 
+
+
+  }
+  ::ng-deep .mat-tab-header-pagination {
+    display: none !important;
+}
+
+::ng-deep .mat-tab-label-container { 
+    overflow: visible !important;
+  }
+
+.sticly{
+    position: sticky !important;
+    position: -webkit-sticky; 
+    width: 100%;
+ 
+    top: 0;
+    background-color: #e4e4e4;
+    padding: 0px 0px 15px 0px;
+    margin: 0;
+    z-index: 2;
+
+
+} ::ng-deep .mat-tab-header
+{
+    position: sticky !important;
+    position: -webkit-sticky; 
+    width: 100%;
+    top: 4em;
+    background-color: #e4e4e4;
+    
+    margin-top: 0;
+    z-index: 3;
+    
+}
+::ng-deep .mat-tab-body-wrapper 
+{
+    position: relative;
+    z-index: 0;
+   
+}
+.stickly{
+    position: fixed !important;
+
+    background-color: #e4e4e4;
+}
+::ng-deep .mat-tab-label-active
+ {
+  
+    opacity: 8;
+    font-weight: 700;
+    background-color: #e4e4e4E4;
+}
+    
+.welcomeImag{
+    
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+    display: flex;
+    margin: 0;
+
+}
+
+.img{
+    filter:  grayscale(50%);
+    border-radius: 40%;
+    padding: 5%;
+    
+    
+}

@@ -10,10 +10,13 @@ export class AppComponent {
   current: string = "microservice";
 
   constructor(private meta: Meta) {
+   
+    
     this.meta.addTag({name: 'viewport', content: 'width=device-width, initial-scale=1.0'});
   }
 
   currentActive(current: string) {
     this.current = current;
   }
+
 }

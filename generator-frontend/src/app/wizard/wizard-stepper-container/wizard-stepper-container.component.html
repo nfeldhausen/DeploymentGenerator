@@ -1,1039 +1,556 @@
-<aw-wizard>
-    <aw-wizard-step [canExit]="nameForm.valid" (stepEnter)="nameForm.resetForm(nameForm.value)" (stepExit)="getImageAnalysis(container,container.image)" stepTitle="General">
-        <form #nameForm="ngForm">
-            <div class="row">
-                <div class="col">
-                    <b>How should this container be called?</b>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Name*</span>
-                        </div>
-                        <input type="text" class="form-control" placeholder="Name" [(ngModel)]="container.name" name="containerName" required pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" #name="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && name.invalid}" (ngModelChange)="adaptServiceName()">
-                        <div class="invalid-feedback">
-                            This field is required and must follow the pattern "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <b>Which image do you want to deploy?</b>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Image*</span>
-                        </div>
-                        <input type="text" class="form-control" placeholder="Image" [(ngModel)]="container.image" name="containerImage" required #image="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && image.invalid}" [ngbTypeahead]="search">
-                        <div class="invalid-feedback">
-                            This field is required
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <b>Does the application need root rights?</b>
-                </div>
-            </div>
-            <div class="row pl-3 mb-2">
-                <div class="col">
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="rootYes" name="rootRights" [value]="true" [(ngModel)]="container.containerAdvancedOptions.privileged" required #rootRights="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && rootRights.invalid}">
-                        <label class="custom-control-label" for="rootYes">Yes</label>
-                    </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="rootNo" name="rootRights" [value]="false" [(ngModel)]="container.containerAdvancedOptions.privileged" required #rootRights="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && rootRights.invalid}">
-                        <label class="custom-control-label" for="rootNo">No</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-primary btn-block" awNextStep>Next Step</button>
-                </div>
-            </div>
-        </form>
-    </aw-wizard-step>
 
-    <aw-wizard-step [canExit]="storageForm.valid || moveBackwards" (stepEnter)="resetForm(storageForm)" stepTitle="Storage">
+<clr-wizard  [(clrWizardOpen)]="xlOpen" clrWizardSize="xl" [clrWizardClosable]="false">
+    <clr-wizard-title> <h3> NEW CONTAINER <img src="../../../assets/images/Illustration5.png" height="60" width="50"></h3> </clr-wizard-title>
+
+    <clr-wizard-button [type]="'cancel'" (click)="submitType = 'START'; getNextPage() "> Cancel</clr-wizard-button>
+    <clr-wizard-button [type]="'previous'">Back</clr-wizard-button>
+    <clr-wizard-button [type]="'next'">Next</clr-wizard-button>
+    <clr-wizard-button [type]="'finish'" (click)="submitType = 'CONTINUE'; getNextPage() ">Continue <i class="fas fa-arrow-circle-right"></i></clr-wizard-button>
+
+    <clr-wizard-page [clrWizardPageNextDisabled]="!nameForm.valid">
+        <ng-template clrPageTitle>General</ng-template>
+        <form #nameForm="ngForm" clrForm clrLayout="horizontal" class="clr-form-compact" clrLabelSize="10" >
+            <clr-input-container>
+                <label>How should this container be called?</label>
+                <input clrInput type="text"  placeholder="Name" [(ngModel)]="container.name" name="containerName" required pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" #name="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && name.invalid}" (ngModelChange)="adaptServiceName()" />
+                <clr-control-helper> This field is required and must follow the pattern "[a-z0-9]([-a-z0-9]*[a-z0-9])?"</clr-control-helper>
+            </clr-input-container>
+            <clr-input-container>
+                <label>Which image do you want to deploy?</label>
+                <input clrInput type="text" placeholder="Image" [(ngModel)]="container.image" name="containerImage" required #image="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && image.invalid}" [ngbTypeahead]="search" />
+                <clr-control-error *clrIfError="'required'">This is a required field</clr-control-error>
+            </clr-input-container>
+            
+
+       
+
+            <clr-radio-container clrInline>
+                <label>Does the application need root rights?</label>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio  id="rootYes" name="rootRights" [value]="true" [(ngModel)]="container.containerAdvancedOptions.privileged" required #rootRights="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && rootRights.invalid}">
+                    <label for="rootYes">Yes</label>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="rootNo" name="rootRights" [value]="false" [(ngModel)]="container.containerAdvancedOptions.privileged" required #rootRights="ngModel" [ngClass]="{'is-invalid': nameForm.submitted && rootRights.invalid}">
+                    <label for="rootNo">No</label>
+                </clr-radio-wrapper>
+           
+            </clr-radio-container>
+
+                
+        </form>
+    </clr-wizard-page>
+
+    <clr-wizard-page [clrWizardPageNextDisabled]="!storageForm.valid">
+        <ng-template clrPageTitle>Storage</ng-template>
         <ngx-spinner bdColor="rgba(51,51,51,0.5)" size="medium" color="#FFF" type="ball-spin-clockwise-fade">
             <p style="font-size: 20px; color: white">Analyzing Image...</p>
         </ngx-spinner>
-        <!--Storage-->
-        <form #storageForm="ngForm">
-            <div class="row">
-                <div class="col">
-                    <a data-toggle="collapse" data-target=".storageCollapse">
-                        <div class="card border-dark">
-                            <div class="storageCollapse collapse">
-                                <div class="card-header">
-                                    <i class="fas fa-info-circle my-auto mr-1"></i> Storage Information
-                                </div>
-                            </div>
-                            <div class="storageCollapse collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-auto my-auto">
-                                            <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="card-text text-justify">The twelve factor methodology advises that applications should be stateless and Shared nothing. So every application should store it's data in a database and not on the VM/Container itself. But some container
-                                                may still require storage (e.g. data nodes of elasticsearch).
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <p class="m-0 text-justify"><b>Does your container store all it's important data in a database or does not
-                        require
-                        to store any
-                        data?</b><span *ngIf="container.analysis?.mountPaths?.length"> Your container got {{container.analysis.mountPaths.length}} Mount Paths and thus may store persistent data!</span>
-                        <span *ngIf="container.analysis && !container.analysis?.mountPaths?.length"> Your container seems not to store any important data on the node.</span></p>
-                </div>
-            </div>
-            <div class="row pl-3 mb-2">
-                <div class="col">
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="databaseStoreYes" name="databaseStore" [value]="true" [(ngModel)]="container.wizardOptions.databaseStore" (ngModelChange)="resetStorage()" required #databaseStore="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && databaseStore.invalid}">
-                        <label class="custom-control-label" for="databaseStoreYes">Yes</label>
-                    </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="databaseStoreNo" name="databaseStore" [value]="false" [(ngModel)]="container.wizardOptions.databaseStore" (ngModelChange)="resetStorage()" required #databaseStore="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && databaseStore.invalid}">
-                        <label class="custom-control-label" for="databaseStoreNo">No</label>
-                    </div>
-                </div>
-            </div>
+        <form #storageForm="ngForm" clrForm>
+        <clr-radio-container clrInline>
+            <label>Does your container store all it's important data in a database or does not require to store any data?</label>
+            <clr-radio-wrapper>
+                <input type="radio" clrRadio id="databaseStoreYes" name="databaseStore" [value]="true" [(ngModel)]="container.wizardOptions.databaseStore" (ngModelChange)="resetStorage()" required #databaseStore="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && databaseStore.invalid}">
+                <label  for="databaseStoreYes">Yes</label>
+            </clr-radio-wrapper>
+            <clr-radio-wrapper>
+                <input type="radio" clrRadio id="databaseStoreNo" name="databaseStore" [value]="false" [(ngModel)]="container.wizardOptions.databaseStore" (ngModelChange)="resetStorage()" required #databaseStore="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && databaseStore.invalid}">
+                <label for="databaseStoreNo">No</label>
+            </clr-radio-wrapper>
+            <clr-control-helper>The twelve factor methodology advises that applications should be stateless and Shared nothing. <br>So every application should store it's data in a database and not on the VM/Container itself.
+                <br> But some container
+                may still require storage (e.g. data nodes of elasticsearch).
+            </clr-control-helper>
+        </clr-radio-container>
 
-            <!--Container stores data in database-->
+        <br>
             <div *ngIf="container.wizardOptions.databaseStore" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".databaseStoreCollapse">
-                            <div class="card border-dark">
-                                <div class="collapse databaseStoreCollapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Database Information
-                                    </div>
-                                </div>
-                                <div class="collapse databaseStoreCollapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">In case you clicked yes, because your container stores all it's important data in a database, it is possible to create predefined databases (MYSQL, MARIADB, redis, postgres, mongodb, couchdb) with this wizard
-                                                    in a later step. With stateless applications it should be easy to scale the container (or in other words to get more instances of the container and your application). It is best practice to increase
-                                                    the number of instances to guarantee a higher availability of your service.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify">
-                            <b>Here you can define how much instances you want of your desired container:</b></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Replicas*</span>
-                            </div>
-                            <input type="number" class="form-control" placeholder="Replicas" min="1" customMin="1" [(ngModel)]="container.replicas" name="containerReplicas" required #replicas="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && replicas.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required and must be a positive number
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <clr-alert [clrAlertClosable]="false">
+                    <clr-alert-item>
+                        
+                        In case you clicked yes, because your container stores all it's important data in a database, it is possible to create predefined databases (MYSQL, MARIADB, redis, postgres, mongodb, couchdb) with this wizard
+                        in a later step. With stateless applications it should be easy to scale the container (or in other words to get more instances of the container and your application). It is best practice to increase
+                        the number of instances to guarantee a higher availability of your service.
+                    
+                    </clr-alert-item>
+                </clr-alert>
+
+
+                <clr-input-container>
+                    <label>Here you can define how much instances you want of your desired container:</label>
+                    <input type="number" clrInput placeholder="Replicas" min="1" customMin="1" [(ngModel)]="container.replicas" name="containerReplicas" required #replicas="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && replicas.invalid}">
+                    
+                    <clr-control-helper>   This field is required and must be a positive number : Replicas</clr-control-helper>
+                </clr-input-container>
+
             </div>
 
-            <!--Container does not store data in database-->
             <div *ngIf="container.wizardOptions.databaseStore === false" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".databaseStoreCollapse">
-                            <div class="card border-dark">
-                                <div class="databaseStoreCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Persistent Storage Information
-                                    </div>
-                                </div>
-                                <div class="databaseStoreCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">Your container does not store all it's important data in a database. If your container still needs to store any data, which has to be persistent (e.g. if you want to create a database yourself), add persistent
-                                                    storage below. For simplicity reasons there will be one persistent storage (or in Kubernetes one PVC) per mount point.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>Set the absolute mount path and a desired size for every storage you
-                            create.</b></p>
-                    </div>
-                </div>
-                <div class="form-row mb-2">
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" (click)="container.addStorage()">Add
-                        Storage</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" [disabled]="!container.analysis?.mountPaths?.length" (click)="appendMountPathsFromImage()">Get Mount Points from Image</button>
-                    </div>
-                </div>
-                <div class="form-row mb-2" *ngFor="let storage of container.storage" [@fastEnterAnimation]>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Path*</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Absolute Mount Path" [(ngModel)]="storage.storageMounts[0].mountPath" name="{{storage.uniqueName}}-path" required pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #path="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && path.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required and must be absolute
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Size*</span>
-                            </div>
-                            <input type="number" class="form-control" placeholder="Size in Mb" min="1" customMin="1" [(ngModel)]="storage.size" name="{{storage.uniqueName}}-size" required #size="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && size.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required and must be a positive number
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-secondary" (click)="container.deleteStorage(storage)"><i
-                            class="fas fa-trash-alt" title="Delete"></i></button>
-                    </div>
-                </div>
-                <!--Authorize Replicas-->
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".scaleCollapse">
-                            <div class="card border-dark">
-                                <div class="scaleCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Replica Information
-                                    </div>
-                                </div>
-                                <div class="scaleCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">
-                                                    It may be possible that your container is not scaleable anymore. If you still need more instances of your container than one and you know what you are doing it is possible to scale the container.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <p class="m-0 text-justify">
-                            <b>Do you want to scale your container despite being a stateful application?</b>
-                        </p>
-                    </div>
-                </div>
-                <div class="row pl-3 mb-2">
-                    <div class="col">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="authorizeScaleYes" name="authorizeScale" [value]="true" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
-                            <label class="custom-control-label" for="authorizeScaleYes">Yes</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="authorizeScaleNo" name="authorizeScale" [value]="false" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
-                            <label class="custom-control-label" for="authorizeScaleNo">No</label>
-                        </div>
-                    </div>
-                </div>
-                <div *ngIf="container.wizardOptions.authorizeScale" [@enterAnimation]>
-                    <div class="row">
-                        <div class="col">
-                            <p class="m-0 text-justify"><b>Set the amount of desired instances of your container</b></p>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">Replicas*</span>
-                                </div>
-                                <input type="number" class="form-control" placeholder="Replicas" min="1" customMin="1" [(ngModel)]="container.replicas" name="containerReplicas" required #replicas="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && replicas.invalid}">
-                                <div class="invalid-feedback">
-                                    This field is required and must be a positive number
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <clr-alert [clrAlertClosable]="false">
+                    <clr-alert-item>
+                        
+                        Your container does not store all it's important data in a database. If your container still needs to store any data, which has to be persistent
+                        (e.g. if you want to create a database yourself), add persistent
+                        storage below. For simplicity reasons there will be one persistent storage (or in Kubernetes one PVC) per mount point.
+                    
+                    </clr-alert-item>
+                </clr-alert>
 
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-block btn-secondary" awPreviousStep>Go back</button>
+
+                <clr-input-container>
+                    <label>Here you can define how much instances you want of your desired container:</label>
+                    <input type="number" clrInput placeholder="Replicas" min="1" customMin="1" [(ngModel)]="container.replicas" name="containerReplicas" required #replicas="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && replicas.invalid}">
+                    
+                    <clr-control-helper>   This field is required and must be a positive number : Replicas</clr-control-helper>
+                </clr-input-container>
+                <br>
+                <button type="button" class="btn btn-primary-outline" [disabled]="!container.analysis?.mountPaths?.length" (click)="appendMountPathsFromImage()">Get Mount Points from Image</button>
+                <button type="button" class="btn btn-primary-outline" (click)="container.addStorage()">Add Storage</button>
+                
+                
+                <clr-control-helper> 
+                    Click on Add Storage and set the absolute mount path and a desired size for every storage you create
+                </clr-control-helper>
+
+                <div  *ngFor="let storage of container.storage" [@fastEnterAnimation]>
+                   
+
+                    <clr-input-container>
+                        <label>Path : </label>
+                        <input type="text" clrInput  placeholder="Absolute Mount Path" [(ngModel)]="storage.storageMounts[0].mountPath" name="{{storage.uniqueName}}-path" required pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #path="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && path.invalid}">
+                        <clr-control-helper> This field is required and must be absolute</clr-control-helper>
+                    </clr-input-container>
+                        
+                    <clr-input-container>
+                        <label>Size : </label>
+                        <input type="number" clrInput class="form-control" placeholder="Size in Mb" min="1" customMin="1" [(ngModel)]="storage.size" name="{{storage.uniqueName}}-size" required #size="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && size.invalid}">
+                        <clr-control-helper> This field is required and must be a positive number</clr-control-helper>
+                    </clr-input-container>
+                    <br> 
+                    <button type="button" class="btn btn-danger-outline" (click)="container.deleteStorage(storage)">Remove Storage  &nbsp;<i class="fas fa-trash-alt" title="Delete"></i></button>
+                    <br>
+
+                    <clr-control-helper> It may be possible that your container is not scaleable anymore. If you still need more instances of your container than one and you know what you are doing it is possible to scale the container.</clr-control-helper>
+
+                   
+
+                    <clr-radio-container clrInline>
+                        <label>Do you want to scale your container despite being a stateful application?</label>
+                        <clr-radio-wrapper>
+                            <input type="radio" clrRadio id="authorizeScaleYes" name="authorizeScale" [value]="true" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
+                            <label class="custom-control-label" for="authorizeScaleYes">Yes</label>
+                        </clr-radio-wrapper>
+                        <clr-radio-wrapper>
+                            <input type="radio" clrRadio id="authorizeScaleNo" name="authorizeScale" [value]="false" [(ngModel)]="container.wizardOptions.authorizeScale" (ngModelChange)="container.replicas=1" required #authorizeScale="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && authorizeScale.invalid}">
+                            <label class="custom-control-label" for="authorizeScaleNo">No</label>
+                        </clr-radio-wrapper>
+                       
+                    </clr-radio-container>
+
+                    <clr-input-container  *ngIf="container.wizardOptions.authorizeScale" [@enterAnimation]>
+                        <label>Amount of desired instances : </label>
+                        <input type="number" clrInput  placeholder="Replicas" min="1" customMin="1" [(ngModel)]="container.replicas" name="containerReplicas" required #replicas="ngModel" [ngClass]="{'is-invalid': storageForm.submitted && replicas.invalid}">
+    
+                        <clr-control-helper> This field is required and must be a positive number</clr-control-helper>
+                    </clr-input-container>
+                    <br>
+                   
                 </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-block btn-primary" awNextStep>Next Step</button>
-                </div>
+                <br><br>
+           
+
             </div>
         </form>
-    </aw-wizard-step>
+    </clr-wizard-page>
 
+    <clr-wizard-page [clrWizardPageNextDisabled]="!envForm.valid">
+        <ng-template clrPageTitle>Environements</ng-template>
+        <form #envForm="ngForm" clrLayout="horizontal" >
 
+            <clr-alert >
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Environment Information : <br>
+                        The twelve factor methodology advises programmers to use environment variables to configure their applications. With container images this should alway be considered and most of the images can be configured
+                        using environment variables.
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
+            <clr-alert [clrAlertType]="'warning'"  *ngIf="container.wizardOptions.envConfigurable" [@enterAnimation]>
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Sadly it is not possible to fetch all environment variables from the container image, but the ones declared in the Dockerfile. Please consult the container documentation of the image to get all useable environment
+                        variables. "Normal" environment variables will get saved in a ConfigMap and "Secret" environment variables will get saved in a Kubernetes Secret. Password variables should be marked as "Secret". If you
+                        need to define environment variables, which represent a connection to another container of this workload, omit the environment variable here. These variables can be set in a later step. If you want to
+                        create a database with this wizard and use the database for your application also omit the database connection link (But you can already define environment variables for credentials and can set them
+                        when creating the database later)
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
 
-    <aw-wizard-step [canExit]="envForm.valid || moveBackwards" (stepEnter)="resetForm(envForm)" stepTitle="Environments">
-        <form #envForm="ngForm">
-            <!--Environment Variables-->
-            <div class="row mb-1">
-                <div class="col">
-                    <a data-toggle="collapse" data-target=".envCollapse">
-                        <div class="card border-dark">
-                            <div class="envCollapse collapse">
-                                <div class="card-header">
-                                    <i class="fas fa-info-circle my-auto mr-1"></i> Environment Information
-                                </div>
-                            </div>
-                            <div class="envCollapse collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-auto my-auto">
-                                            <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="m-0 text-justify">The twelve factor methodology advises programmers to use environment variables to configure their applications. With container images this should alway be considered and most of the images can be configured
-                                                using environment variables.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <p class="m-0 text-justify"><b>Does your container support to be configured via environment variables?</b><span *ngIf="container.analysis?.environments?.length"> Your container seems to declare {{container.analysis.environments.length}} environment variables.</span>
-                        <span *ngIf="container.analysis && !container.analysis?.environments?.length"> Your container seems to declare no environment variables</span>
-                    </p>
-                </div>
-            </div>
-            <div class="row pl-3 mb-2">
-                <div class="col">
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="envConfigurableYes" name="envConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.envConfigurable" (ngModelChange)="resetEnvironmentVariables()" required #envConfigurable="ngModel" [ngClass]="{'is-invalid': envForm.submitted && envConfigurable.invalid}">
-                        <label class="custom-control-label" for="envConfigurableYes">Yes</label>
-                    </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="envConfigurableNo" name="envConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.envConfigurable" (ngModelChange)="resetEnvironmentVariables()" #envConfigurable="ngModel" [ngClass]="{'is-invalid': envForm.submitted && envConfigurable.invalid}">
-                        <label class="custom-control-label" for="envConfigurableNo">No</label>
-                    </div>
-                </div>
-            </div>
+            <clr-alert *ngIf="container.wizardOptions.envConfigurable === false" [@enterAnimation]>
 
-            <!--Setting Environment Variables possible-->
-            <div *ngIf="container.wizardOptions.envConfigurable" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".envConfigurable">
-                            <div class="card border-dark">
-                                <div class="envConfigurable collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Environment Information 2
-                                    </div>
-                                </div>
-                                <div class="envConfigurable collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">Sadly it is not possible to fetch all environment variables from the container image, but the ones declared in the Dockerfile. Please consult the container documentation of the image to get all useable environment
-                                                    variables. "Normal" environment variables will get saved in a ConfigMap and "Secret" environment variables will get saved in a Kubernetes Secret. Password variables should be marked as "Secret". If you
-                                                    need to define environment variables, which represent a connection to another container of this workload, omit the environment variable here. These variables can be set in a later step. If you want to
-                                                    create a database with this wizard and use the database for your application also omit the database connection link (But you can already define environment variables for credentials and can set them
-                                                    when creating the database later)
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>Set the name and the value for every environment variable you create</b>
-                        </p>
-                    </div>
-                </div>
-                <div class="form-row mb-2">
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" (click)="container.addEnvironmentVariable()">Add
-                        Environment Variable</button>
-                    </div>
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" [disabled]="!container.analysis?.environments?.length" (click)="appendVariablesFromImage()">Get Variables from Image</button>
-                    </div>
-                </div>
-                <div class="form-row mb-2" *ngFor="let variable of container.environments" [@fastEnterAnimation]>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Name*</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Name" [(ngModel)]="variable.name" name="{{variable.uniqueName}}-name" required #vname="ngModel" [ngClass]="{'is-invalid': envForm.submitted && vname.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto my-auto">
-                        =
-                    </div>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Value</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Value" [(ngModel)]="variable.value" name="{{variable.uniqueName}}-value" #vvalue="ngModel">
-                        </div>
-                    </div>
-                    <div class="col-auto my-auto">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="{{variable.uniqueName}}-secret" [(ngModel)]="variable.secret" name="{{variable.uniqueName}}-secret">
-                            <label class="custom-control-label" for="{{variable.uniqueName}}-secret">Secret</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-secondary" (click)="container.deleteEnvironmentVariable(variable)"><i class="fas fa-trash-alt"
-                            title="Delete"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <!--Setting Environment Variables is not possible-->
-            <div class="row mb-2" *ngIf="container.wizardOptions.envConfigurable === false" [@enterAnimation]>
-                <div class="col">
-                    <p class="m-0 text-danger text-justify"><b>Because this generator does not support custom ConfigMaps, it may
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Because this generator does not support custom ConfigMaps, it may
                         not be
                         possible to
                         deploy your
-                        workload/container with this wizard!</b></p>
-                </div>
-            </div>
+                        workload/container with this wizard!
+                       
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
 
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-block btn-secondary" awPreviousStep>Go back</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-block btn-primary" awNextStep>Next step</button>
-                </div>
+         
+            <clr-radio-container clrInline>
+                <label>Does your container support to be configured via environment variables?</label>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="envConfigurableYes" name="envConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.envConfigurable" (ngModelChange)="resetEnvironmentVariables()" required #envConfigurable="ngModel" [ngClass]="{'is-invalid': envForm.submitted && envConfigurable.invalid}">
+                    <label class="custom-control-label" for="envConfigurableYes">Yes</label>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="envConfigurableNo" name="envConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.envConfigurable" (ngModelChange)="resetEnvironmentVariables()" #envConfigurable="ngModel" [ngClass]="{'is-invalid': envForm.submitted && envConfigurable.invalid}">
+                        <label class="custom-control-label" for="envConfigurableNo">No</label>
+                </clr-radio-wrapper>
+
+                <clr-control-helper>
+                    <span *ngIf="container.analysis?.environments?.length"> Your container seems to declare {{container.analysis.environments.length}} environment variables.</span>
+                    <span *ngIf="container.analysis && !container.analysis?.environments?.length"> Your container seems to declare no environment variables</span>
+                
+                </clr-control-helper>
+
+               
+               
+            </clr-radio-container>
+            <button type="button" class="btn btn-primary-outline" [disabled]="!container.analysis?.environments?.length" (click)="appendVariablesFromImage()">Get Variables from Image</button>
+            <button type="button" class="btn btn-primary-outline" (click)="container.addEnvironmentVariable()">Add Environment Variable</button>
+
+            <div *ngFor="let variable of container.environments" [@fastEnterAnimation]>
+
+
+
+                <clr-input-container>
+                    <label>Name : </label>
+                    <input type="text" clrInput placeholder="Name" [(ngModel)]="variable.name" name="{{variable.uniqueName}}-name" required #vname="ngModel" [ngClass]="{'is-invalid': envForm.submitted && vname.invalid}">
+                </clr-input-container>
+                <clr-input-container>
+                    <label>Value : </label>
+                    <input type="text" clrInput placeholder="Value" [(ngModel)]="variable.value" name="{{variable.uniqueName}}-value" #value="ngModel">
+                </clr-input-container>
+
+                <clr-checkbox-container>
+                    <clr-checkbox-wrapper>
+                      <input type="checkbox" clrCheckbox  id="{{variable.uniqueName}}-secret" [(ngModel)]="variable.secret" name="{{variable.uniqueName}}-secret">
+                      <label class="custom-control-label" for="{{variable.uniqueName}}-secret">Secret</label>
+                    </clr-checkbox-wrapper>
+                </clr-checkbox-container>
+                <br>
+
+                <button type="button" class="btn btn-danger-outline" (click)="container.deleteEnvironmentVariable(variable)">
+                    Remove Variable &nbsp;<i class="fas fa-trash-alt"
+                    title="Delete"></i>
+                </button>
+              
             </div>
+            
+           
+
         </form>
-    </aw-wizard-step>
+    </clr-wizard-page>
+    <clr-wizard-page [clrWizardPageNextDisabled]="!initForm.valid">
+        <ng-template clrPageTitle>Init</ng-template>
+        <form #initForm="ngForm" clrForm>
 
+            <clr-alert >
+                <clr-alert-item>
+                    <span class="alert-text">
+                        In Kubernetes it is also possible to use Init Containers in order to pull necessary resources for the actual container or to configure pod settings (e.g. vm.max_map_count from Elasticsearch)
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
 
-    <aw-wizard-step [canExit]="initForm.valid || moveBackwards" (stepEnter)="resetForm(initForm)" stepTitle="Init">
-        <!--InitContainers-->
-        <form #initForm="ngForm">
-            <div class="row mb-1">
-                <div class="col">
-                    <a data-toggle="collapse" data-target=".initCollapse">
-                        <div class="card border-dark">
-                            <div class="initCollapse collapse">
-                                <div class="card-header">
-                                    <i class="fas fa-info-circle my-auto mr-1"></i> Init Container Information
-                                </div>
-                            </div>
-                            <div class="initCollapse collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-auto my-auto">
-                                            <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="card-text text-justify">In Kubernetes it is also possible to use Init Containers in order to pull necessary resources for the actual container or to configure pod settings (e.g. vm.max_map_count from Elasticsearch).
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <p class="m-0 text-justify"><b>Do you want to setup your container with init containers?</b></p>
-                </div>
-            </div>
-            <div class="row pl-3 mb-2">
-                <div class="col">
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="initConfigurableYes" name="initConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.initConfigurable" (ngModelChange)="resetInitContainers()" required #initConfigurable="ngModel" [ngClass]="{'is-invalid': initForm.submitted && initConfigurable.invalid}">
-                        <label class="custom-control-label" for="initConfigurableYes">Yes</label>
-                    </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="initConfigurableNo" name="initConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.initConfigurable" (ngModelChange)="resetInitContainers()" required #initConfigurable="ngModel" [ngClass]="{'is-invalid': initForm.submitted && initConfigurable.invalid}">
-                        <label class="custom-control-label" for="initConfigurableNo">No</label>
-                    </div>
-                </div>
-            </div>
+            <clr-radio-container clrInline>
+                <label>Do you want to setup your container with init containers?</label>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="initConfigurableYes" name="initConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.initConfigurable" (ngModelChange)="resetInitContainers()" required #initConfigurable="ngModel" [ngClass]="{'is-invalid': initForm.submitted && initConfigurable.invalid}">
+                    <label class="custom-control-label" for="initConfigurableYes">Yes</label>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="initConfigurableNo" name="initConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.initConfigurable" (ngModelChange)="resetInitContainers()" required #initConfigurable="ngModel" [ngClass]="{'is-invalid': initForm.submitted && initConfigurable.invalid}">
+                    <label class="custom-control-label" for="initConfigurableNo">No</label>
+                </clr-radio-wrapper>
+            </clr-radio-container>
+            <br>
 
-            <!--InitContainers Definition-->
             <div *ngIf="container.wizardOptions.initConfigurable" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".initConfigurable">
-                            <div class="card border-dark">
-                                <div class="initConfigurable collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Init Container Information 2
-                                    </div>
-                                </div>
-                                <div class="initConfigurable collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">The wizard uses the ubuntu bionic image as base image for init containers. If you need additional software to configure your app, you have to install these applications first (use sh -c apt-get update; apt-get
+                <clr-alert >
+                    <clr-alert-item>
+                        <span class="alert-text">
+                            The wizard uses the ubuntu bionic image as base image for init containers. If you need additional software to configure your app, you have to install these applications first (use sh -c apt-get update; apt-get
                                                     install -y ...; to install additional software). In case that you want to prepopulate a directory with content (e.g. html files for nginx) you also have to mount a directory in the init container. Therefore
                                                     just enter the absolute mount path in the path field below. Some commands may require higher privileges. In this case check the "Privileged" Checkbox
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>Set a command for every init container you create.</b> Start with "sh -c" for example</p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <button type="button" class="btn btn-primary btn-block" (click)="container.containerAdvancedOptions.addInitContainer()">Add Init Container</button>
-                    </div>
-                </div>
-                <div class="form-row mb-2" *ngFor="let initContainer of container.containerAdvancedOptions.initContainers" [@fastEnterAnimation]>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Commands</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Commands (Start with sh -c for example)" [(ngModel)]="initContainer.command" name="{{initContainer.uniqueName}}-command" required #icommand="ngModel" [ngClass]="{'is-invalid': initForm.submitted && icommand.invalid}">
-                            <div class="invalid-feedback">
-                                This field is required
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Path</span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Absolute Mount Path" [(ngModel)]="initContainer.mountPath" name="{{initContainer.uniqueName}}-path" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #ipath="ngModel" [ngClass]="{'is-invalid': initForm.submitted && ipath.invalid}">
-                            <div class="invalid-feedback">
-                                This field is must follow the pattern "\/([a-z]|[A-Z]|[0-9]|\/)+"
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-auto my-auto">
-                        <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="{{initContainer.uniqueName}}-Privilege" [(ngModel)]="initContainer.privileged" name="{{initContainer.uniqueName}}-Privilege">
+                        </span>
+                    </clr-alert-item>
+                </clr-alert>
+                <br>
+                <button type="button" class="btn btn-primary" (click)="container.containerAdvancedOptions.addInitContainer()">Add Init Container</button>
+
+                <div *ngFor="let initContainer of container.containerAdvancedOptions.initContainers" [@fastEnterAnimation]>
+                    <clr-input-container>
+                        <label>Commands : </label>
+                        <input type="text" clrInput placeholder="Commands (Start with sh -c for example)" [(ngModel)]="initContainer.command" name="{{initContainer.uniqueName}}-command" required #icommand="ngModel" [ngClass]="{'is-invalid': initForm.submitted && icommand.invalid}">
+                        <clr-control-helper>Helper text</clr-control-helper>
+                        <clr-control-error>This field is required!</clr-control-error>
+                    </clr-input-container>
+
+                    <clr-input-container>
+                        <label>Path : </label>
+                        <input type="text" clrInput placeholder="Absolute Mount Path" [(ngModel)]="initContainer.mountPath" name="{{initContainer.uniqueName}}-path" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #ipath="ngModel" [ngClass]="{'is-invalid': initForm.submitted && ipath.invalid}">
+                        <clr-control-helper>This field is must follow the pattern "\/([a-z]|[A-Z]|[0-9]|\/)+"</clr-control-helper>
+                    </clr-input-container>
+
+                    <clr-checkbox-container>
+                        <clr-checkbox-wrapper>
+                            <input type="checkbox" clrCheckbox  id="{{initContainer.uniqueName}}-Privilege" [(ngModel)]="initContainer.privileged" name="{{initContainer.uniqueName}}-Privilege">
                             <label class="custom-control-label" for="{{initContainer.uniqueName}}-Privilege">Privileged</label>
-                        </div>
-                    </div>
-                    <div class="col-auto">
-                        <button type="button" class="btn btn-secondary" (click)="container.containerAdvancedOptions.deleteInitContainer(initContainer)"><i
-                            class="fas fa-trash-alt" title="Delete"></i></button>
-                    </div>
+                            
+                        </clr-checkbox-wrapper>
+                    
+                    </clr-checkbox-container>
+                    <br>
+                    <button type="button" class="btn btn-danger-outline" (click)="container.containerAdvancedOptions.deleteInitContainer(initContainer)">
+                        Remove Init Container &nbsp;<i class="fas fa-trash-alt" title="Delete"></i>
+                    </button>
+                    
                 </div>
+                
+                <!-- <clr-control-helper>
+                    Set a command for every init container you create.</b> Start with "sh -c" for example
+                </clr-control-helper> -->
             </div>
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-block btn-secondary" awPreviousStep>Go back</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-block btn-primary" awNextStep>Next Step</button>
-                </div>
-            </div>
-        </form>
-    </aw-wizard-step>
+            <br class="card-footer">
 
-    <aw-wizard-step [canExit]="portForm.valid || moveBackwards" (stepEnter)="resetForm(portForm)" stepTitle="Ports">
-        <form #portForm="ngForm">
-            <!--Container Ports-->
-            <div class="row mb-1">
-                <div class="col">
-                    <div class="card border-dark">
-                        <a data-toggle="collapse" data-target=".portCollapse">
-                            <div class="portCollapse collapse">
-                                <div class="card-header">
-                                    <i class="fas fa-info-circle my-auto mr-1"></i> Port Information
-                                </div>
-                            </div>
-                            <div class="portCollapse collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-auto my-auto">
-                                            <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="card-text text-justify">In order to communicate with your application or in order to let your container communicate with each other it is necessary to export ports of your application. Sadly as for environments it is not possible to
-                                                extract ports from the container image. By default all ports will only be accessible within the Kubernetes Cluster. If you want to access the applications on this ports from outside the Kubernetes Cluster,
-                                                it is necessary to expose the ports with a NodePort or LoadBalancer service (There are also other Kubernetes Services available, but for simplicity reasons only NodePort and LoadBalancer services are possible
-                                                to use here. If you chose a LoadBalancer it is only possible to export ports with the same Protocol!).
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p class="m-0 text-justify"><b>Define all necessary ports below and mark the ports which should externally
-                        accessible with the
-                        "Export" Checkbox.</b><span *ngIf="container.analysis?.ports?.length"> Your container seems to expose {{container.analysis.ports.length}} ports.</span>
-                        <span *ngIf="container.analysis && !container.analysis?.ports?.length"> Your container seems to expose no ports.</span>
-                    </p>
-                </div>
-            </div>
-            <div class="form-row mb-2">
-                <div class="col">
-                    <button type="button" class="btn btn-primary btn-block" (click)="container.addPort()">Add Port</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-primary btn-block" [disabled]="!container.analysis?.ports?.length" (click)="appendPortsFromImage()">Get Ports from Image</button>
-                </div>
-            </div>
+
+        </form>
+
+    </clr-wizard-page>
+    <clr-wizard-page [clrWizardPageNextDisabled]="!portForm.valid">
+        <ng-template clrPageTitle>Ports</ng-template>
+        <form  #portForm="ngForm" clrForm>
+            <clr-alert>
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Port Information : <br>
+                        In order to communicate with your application or in order to let your container communicate with each other it is necessary to export ports of your application.
+                         Sadly as for environments it is not possible to extract ports from the container image. By default all ports will only be accessible within the Kubernetes Cluster.
+                          If you want to access the applications on this ports from outside the Kubernetes Cluster, it is necessary to expose the ports with a NodePort or LoadBalancer service (There are also other Kubernetes Services available,
+                           but for simplicity reasons only NodePort and LoadBalancer services are possible to use here. If you chose a LoadBalancer it is only possible to export ports with the same Protocol!).
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
+            <p class="p3"><b>Define all necessary ports below and mark the ports which should externally
+                accessible with the
+                "Export" Checkbox.</b><span *ngIf="container.analysis?.ports?.length"> Your container seems to expose {{container.analysis.ports.length}} ports.</span>
+                <span *ngIf="container.analysis && !container.analysis?.ports?.length"> Your container seems to expose no ports.</span>
+            </p>
+            <button type="button" class="btn btn-primary" [disabled]="!container.analysis?.ports?.length" (click)="appendPortsFromImage()">Get Ports from Image</button>
+            <button type="button" class="btn btn-primary" (click)="container.addPort()">Add Port</button>
+    
             <div class="form-row mb-2" *ngFor="let port of container.ports" [@fastEnterAnimation]>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Port*</span>
-                        </div>
-                        <input type="number" class="form-control" placeholder="Port (1-65535)" min="1" customMin="1" max="65535" customMax="65535" [(ngModel)]="port.port" name="{{port.uniqueName}}-port" required #pport="ngModel" [ngClass]="{'is-invalid': portForm.submitted && pport.invalid}"
-                            (ngModelChange)="changePortInService(port)">
-                        <div class="invalid-feedback">
-                            This field is required and the value must be between 1 and 65535
-                        </div>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">Protocol*</span>
-                        </div>
-                        <select class="custom-select" [(ngModel)]="port.protocol" name="{{port.uniqueName}}-protocol" (ngModelChange)="changePortInService()">
-                            <option>TCP</option>
-                            <option>UDP</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            This field is required
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto my-auto">
-                    <div class="custom-control custom-checkbox">
-                        <input type="checkbox" class="custom-control-input" id="{{port.uniqueName}}-export" name="{{port.uniqueName}}-export" [checked]="isPortExported(port)" (change)="changePortService(port,$event)">
+                
+                <form clrForm clrLayout="horizontal">
+                <clr-input-container>
+                    <label>Port :</label>
+                    <input type="number" clrInput placeholder="Port (1-65535)" min="1" customMin="1" max="65535" customMax="65535" [(ngModel)]="port.port" name="{{port.uniqueName}}-port" required #pport="ngModel" [ngClass]="{'is-invalid': portForm.submitted && pport.invalid}" (ngModelChange)="changePortInService(port)">
+                    <clr-control-helper> This field is required and the value must be between 1 and 65535 </clr-control-helper>
+                </clr-input-container>
+             
+                <clr-select-container>
+               
+                    <label>Protocol : </label>
+                    <select clrSelect [(ngModel)]="port.protocol" name="{{port.uniqueName}}-protocol" (ngModelChange)="changePortInService()">
+                        <option>TCP</option>
+                        <option>UDP</option>
+                    </select>
+                    
+                  </clr-select-container>
+    
+                  <clr-checkbox-container>
+                    <clr-checkbox-wrapper>
+                        <input type="checkbox" clrCheckbox id="{{port.uniqueName}}-export" name="{{port.uniqueName}}-export" [checked]="isPortExported(port)" (change)="changePortService(port,$event)">
                         <label class="custom-control-label" for="{{port.uniqueName}}-export">Export</label>
+                    </clr-checkbox-wrapper>
+                
+                </clr-checkbox-container>
+               
+                <button type="button" class="btn btn-danger-outline" (click)="deletePort(port)">
+                    Remove Port &nbsp; <i class="fas fa-trash-alt" title="Delete"></i>
+                </button>
+            </form>
+                <br>
+                <div *ngIf="service" [@enterAnimation]>
+                    <div >
+                        <b>Expose all marked ports with the following Service:</b>
                     </div>
+                    <clr-select-container >
+                       
+                            <label >
+                                ServiceType : 
+                            </label>
+                            <select name="exportType" clrSelect  [(ngModel)]="service.type">
+                            <option>NodePort</option>
+                            <option>LoadBalancer</option>
+                            </select>
+                            <clr-control-helper> 
+                                This field is required
+                            </clr-control-helper> 
+                       
+                    </clr-select-container>
                 </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" (click)="deletePort(port)"><i class="fas fa-trash-alt"
-                        title="Delete"></i></button>
-                </div>
+             
+               
             </div>
-            <div class="form-row mb-2" *ngIf="service" [@enterAnimation]>
-                <div class="col-auto my-auto">
-                    <b>Expose all marked ports with the following Service:</b>
-                </div>
-                <div class="col">
-                    <div class="input-group">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">ServiceType*</span>
-                        </div>
-                        <select class="custom-select" name="exportType" [(ngModel)]="service.type">
-                        <option>NodePort</option>
-                        <option>LoadBalancer</option>
-                        </select>
-                        <div class="invalid-feedback">
-                            This field is required
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-block btn-secondary" awPreviousStep>Go back</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-block btn-primary" awNextStep>Next Step</button>
-                </div>
-            </div>
+           
         </form>
-    </aw-wizard-step>
-    <aw-wizard-step (stepEnter)="resetForm(probeForm)" stepTitle="Probe">
-        <!--Liveness/Readiness Probe-->
+    </clr-wizard-page>
+    <clr-wizard-page [clrWizardPageNextDisabled]="!probeForm.valid">
+        <ng-template clrPageTitle>Probe</ng-template>
         <form #probeForm="ngForm" (ngSubmit)="probeForm.valid && getNextPage()">
-            <div class="row mb-1">
-                <div class="col">
-                    <a data-toggle="collapse" data-target=".probeCollapse">
-                        <div class="card border-dark">
-                            <div class="probeCollapse collapse">
-                                <div class="card-header">
-                                    <i class="fas fa-info-circle my-auto mr-1"></i> Health Check Information
-                                </div>
-                            </div>
-                            <div class="probeCollapse collapse show">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-auto my-auto">
-                                            <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                        </div>
-                                        <div class="col">
-                                            <p class="card-text text-justify">The twelve factory methodology advises programmers to use package mangers to manage and build theire applications. While this is not important for the Kubernetes Deployment, because the containers got all theire
-                                                dependencies baked in the image, you can look at service dependencies instead of normal dependencies. Kubernetes supports checking for your applications health and depending if it's healthy or not, Kubernetes
-                                                will stop sending traffic to the container and may restart the container.
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row mb-2">
-                <div class="col">
-                    <p class="m-0 text-justify"><b>Do you want that Kubernetes checks the state of your application?</b></p>
-                </div>
-            </div>
-            <div class="row pl-3 mb-2">
-                <div class="col">
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="probeConfigurableYes" name="probeConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.probeConfigurable" (ngModelChange)="resetProbe()" required #probeConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && probeConfigurable.invalid}">
+            <clr-alert>
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Health Check Information : <br>
+                        he twelve factory methodology advises programmers to use package mangers to manage and build theire applications.
+                        While this is not important for the Kubernetes Deployment, because the containers got all theire dependencies baked in the image, you can look at service dependencies instead of normal dependencies.
+                        Kubernetes supports checking for your applications health and depending if it's healthy or not, Kubernetes will stop sending traffic to the container and may restart the container.
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
+
+            <clr-radio-container clrInline>
+                <label>Do you want that Kubernetes checks the state of your application?</label>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="probeConfigurableYes" name="probeConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.probeConfigurable" (ngModelChange)="resetProbe()" required #probeConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && probeConfigurable.invalid}">
                         <label class="custom-control-label" for="probeConfigurableYes">Yes</label>
-                    </div>
-                    <div class="custom-control custom-radio">
-                        <input type="radio" class="custom-control-input" id="probeConfigurableNo" name="probeConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.probeConfigurable" (ngModelChange)="resetProbe()" required #probeConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && probeConfigurable.invalid}">
-                        <label class="custom-control-label" for="probeConfigurableNo">No</label>
-                    </div>
-                </div>
-            </div>
+                </clr-radio-wrapper>
+                <clr-radio-wrapper>
+                    <input type="radio" clrRadio id="probeConfigurableNo" name="probeConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.probeConfigurable" (ngModelChange)="resetProbe()" required #probeConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && probeConfigurable.invalid}">
+                    <label class="custom-control-label" for="probeConfigurableNo">No</label>
+                </clr-radio-wrapper>
+                <clr-control-error>This field is required!</clr-control-error>
+              </clr-radio-container>
+              <div *ngIf="container.wizardOptions.probeConfigurable" [@enterAnimation]>
+                <clr-alert>
+                    <clr-alert-item>
+                        <span class="alert-text">
+                            Health Check Possibilities Information : <br>
+                         
+                            Currently the wizard supports health checks in form of a simple TCP connection to a applications port or it supports a health check in form of a HTTP request to an application if it supports HTTP connectivity.
+                        </span>
+                    </clr-alert-item>
+                </clr-alert>
 
-            <!--User want to configure livenessProbe-->
-            <div *ngIf="container.wizardOptions.probeConfigurable" [@enterAnimation]>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".httpCollapse">
-                            <div class="card border-dark">
-                                <div class="httpCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Health Check Possibilities Information
-                                    </div>
-                                </div>
-                                <div class="httpCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">Currently the wizard supports health checks in form of a simple TCP connection to a applications port or it supports a health check in form of a HTTP request to an application if it supports HTTP connectivity.</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>Is it possible to communicate with your application over HTTP?</b></p>
-                    </div>
-                </div>
-                <!--Does Container support HTTP requests?-->
-                <div class="row pl-3 mb-2">
-                    <div class="col">
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="httpConfigurableYes" name="httpConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.httpConfigurable" (ngModelChange)="resetHttp()" required #httpConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpConfigurable.invalid}">
+                <clr-radio-container clrInline>
+                    <label>Is it possible to communicate with your application over HTTP?</label>
+                    <clr-radio-wrapper>
+                        <input type="radio" clrRadio id="httpConfigurableYes" name="httpConfigurable" [value]="true" [(ngModel)]="container.wizardOptions.httpConfigurable" (ngModelChange)="resetHttp()" required #httpConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpConfigurable.invalid}">
                             <label class="custom-control-label" for="httpConfigurableYes">Yes</label>
-                        </div>
-                        <div class="custom-control custom-radio">
-                            <input type="radio" class="custom-control-input" id="httpConfigurableNo" name="httpConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.httpConfigurable" (ngModelChange)="resetHttp()" required #httpConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpConfigurable.invalid}">
-                            <label class="custom-control-label" for="httpConfigurableNo">No</label>
-                        </div>
-                    </div>
-                </div>
+                    </clr-radio-wrapper>
+                    <clr-radio-wrapper>
+                        <input type="radio" clrRadio id="httpConfigurableNo" name="httpConfigurable" [value]="false" [(ngModel)]="container.wizardOptions.httpConfigurable" (ngModelChange)="resetHttp()" required #httpConfigurable="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpConfigurable.invalid}">
+                        <label class="custom-control-label" for="httpConfigurableNo">No</label>
+                    </clr-radio-wrapper>
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-radio-container>
+            
+            <div *ngIf="container.wizardOptions.httpConfigurable" [@enterAnimation]>
+                <clr-input-container>
+                    <label>HTTP Path : </label>
+                    <input type="text" clrInput placeholder="Http Path (no subpath with /)" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpAction" name="httpPath" required #httpPath="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpPath.invalid}">
+                    <clr-control-helper>Helper text</clr-control-helper>
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-input-container>
 
-                <!--HTTP requests possible-->
-                <div *ngIf="container.wizardOptions.httpConfigurable" [@enterAnimation]>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <p class="m-0 text-justify"><b>Please fill in the HTTP request path (for no subpath just insert a
-                                "/")
-                                and
-                                the port
-                                which serves HTTP requests below.</b></p>
-                        </div>
-                    </div>
-                    <div class="form-row mb-2">
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">HTTP Path*</span>
-                                </div>
-                                <input type="text" class="form-control" placeholder="Http Path (no subpath with /)" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpAction" name="httpPath" required #httpPath="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpPath.invalid}">
-                                <div class="invalid-feedback">
-                                    This field is required
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">HTTP Port*</span>
-                                </div>
-                                <select class="custom-select" name="httpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpPort" required #httpPort="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpPort.invalid}">
-                                <option *ngFor="let port of container.ports" [ngValue]="port.port">{{port.port}}</option>
-                                </select>
-                                <div class="invalid-feedback">
-                                    This field is required
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!--HTTP requests not possible-->
-                <div *ngIf="container.wizardOptions.httpConfigurable === false" [@enterAnimation]>
-                    <div class="row">
-                        <div class="col">
-                            <p class="m-0 text-justify"><b>Please choose the port on which Kubernetes should check the health of
-                                the
-                                application</b></p>
-                        </div>
-                    </div>
-                    <div class="row mb-2">
-                        <div class="col">
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">TCP Port*</span>
-                                </div>
-                                <select class="custom-select" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.tcpPort" name="tcpPort" required #tcpPort="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && tcpPort.invalid}">
-                                <option *ngFor="let port of container.ports" [ngValue]="port.port">{{port.port}}</option>
-                                </select>
-                                <div class="invalid-feedback">
-                                    This field is required
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".startupCollapse">
-                            <div class="card border-dark">
-                                <div class="startupCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Startup Information
-                                    </div>
-                                </div>
-                                <div class="startupCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">The wizard will deploy the application health check with fairly conservative parameters. To guarantee a fast start of the container and to receive traffic as early as possible, it is necessary to know the
-                                                    startup time of the application. A startup time which is set too low, will lead to Kubernetes killing the container and a too long startup time will lead to a slow starting container (or rather to a
-                                                    slow responding container, because it will receive no traffic).</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>How fast does your application typically start?</b></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Startup time*</span>
-                            </div>
-                            <select class="custom-select" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.initialDelaySeconds" name="startupDelay" required #startupDelay="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && startupDelay.invalid}">
-                            <option [value]="0">fast (0 seconds)</option>
-                            <option [value]="15">medium fast (15 seconds)</option>
-                            <option [value]="30">medium (30 seconds)</option>
-                            <option [value]="45">medium slow (45 seconds)</option>
-                            <option [value]="60">slow (60 seconds)</option>
-                            </select>
-                            <div class="invalid-feedback">
-                                This field is required
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col">
-                        <a data-toggle="collapse" data-target=".shutdownCollapse">
-                            <div class="card border-dark">
-                                <div class="shutdownCollapse collapse">
-                                    <div class="card-header">
-                                        <i class="fas fa-info-circle my-auto mr-1"></i> Shutdown Information
-                                    </div>
-                                </div>
-                                <div class="shutdownCollapse collapse show">
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-auto my-auto">
-                                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                                            </div>
-                                            <div class="col">
-                                                <p class="card-text text-justify">Kubernetes tries to exit applications gracefully, but sometimes this is not possible because the application is stuck in a deadlock for example. In this case Kubernetes just kills the container. Kubernetes
-                                                    can not determine if the application is stuck in a deadlock or just needs a long time to shutdown. In this case the user should give the container a longer GracePeroid.
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <p class="m-0 text-justify"><b>How fast does your application typically need to shutdown?</b></p>
-                    </div>
-                </div>
-                <div class="row mb-2">
-                    <div class="col">
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Grace Period</span>
-                            </div>
-                            <select class="custom-select" [(ngModel)]="container.containerAdvancedOptions.gracePeriod" name="gracePeriod" required #gracePeriod="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && gracePeriod.invalid}">
-                            <option [value]="0">fast (0 seconds)</option>
-                            <option [value]="15">medium fast (15 seconds)</option>
-                            <option [value]="30">medium (30 seconds)</option>
-                            <option [value]="45">medium slow (45 seconds)</option>
-                            <option [value]="60">slow (60 seconds)</option>
-                            </select>
-                            <div class="invalid-feedback">
-                                This field is required
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <clr-select-container>
+                    <label>HTTP Port : </label>
+                    <select clrSelect name="httpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpPort" required #httpPort="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && httpPort.invalid}">
+                        <option *ngFor="let port of container.ports" [ngValue]="port.port">{{port.port}}</option>
+                    </select>
+                    <clr-control-error>This field is required!</clr-control-error>   
+                    <clr-control-helper class="m-0 text-justify"><b>Please fill in the HTTP request path (for no subpath just insert a
+                        "/")
+                        and
+                        the port
+                        which serves HTTP requests below.</b></clr-control-helper>
+                </clr-select-container>
+                
             </div>
-            <div class="form-row">
-                <div class="col">
-                    <button type="button" class="btn btn-secondary btn-block" awPreviousStep>Go back</button>
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block" (click)="resetContainer()">Reset Container</button>
-                </div>
-                <div class="col" *ngIf="request.containers.length">
-                    <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip Container</button>
-                </div>
-                <div class="col" *ngIf="mainWizardOptions.singleContainer">
-                    <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'ADD'">Add anoter Container</button>
-                </div>
-                <div class="col">
-                    <button type="submit" class="btn btn-block btn-primary" (click)="submitType = 'CONTINUE'">Continue</button>
-                </div>
+            <div *ngIf="container.wizardOptions.httpConfigurable === false" [@enterAnimation]>
+                <clr-select-container>
+                    <label>TCP Port : </label>
+                    <select clrSelect [(ngModel)]="container.containerAdvancedOptions.readinessProbe.tcpPort" name="tcpPort" required #tcpPort="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && tcpPort.invalid}">
+                        <option *ngFor="let port of container.ports" [ngValue]="port.port">{{port.port}}</option>
+                        </select>
+                    <clr-control-error>This field is required!</clr-control-error>   
+                    <clr-control-helper >Please choose the port on which Kubernetes should check the health of the application</clr-control-helper>
+                </clr-select-container>
             </div>
-        </form>
-    </aw-wizard-step>
-</aw-wizard>
+
+            <clr-alert>
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Startup Information : <br>
+                        The wizard will deploy the application health check with fairly conservative parameters.
+                         To guarantee a fast start of the container and to receive traffic as early as possible, it is necessary to know the startup time of the application. 
+                         A startup time which is set too low, will lead to Kubernetes killing the container and a too long startup time will lead to a slow starting container (or rather to a slow responding container,
+                          because it will receive no traffic).
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
+            <p class="m-0 text-justify"><b>How fast does your application typically start?</b></p>
+
+            <clr-select-container>
+                <label>Startup time : </label>
+                <select clrSelect [(ngModel)]="container.containerAdvancedOptions.readinessProbe.initialDelaySeconds" name="startupDelay" required #startupDelay="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && startupDelay.invalid}">
+                    <option [value]="0">fast (0 seconds)</option>
+                    <option [value]="15">medium fast (15 seconds)</option>
+                    <option [value]="30">medium (30 seconds)</option>
+                    <option [value]="45">medium slow (45 seconds)</option>
+                    <option [value]="60">slow (60 seconds)</option>
+                    </select>
+                
+                <clr-control-error>This field is required!</clr-control-error>
+            </clr-select-container>
+
+
+            <clr-alert>
+                <clr-alert-item>
+                    <span class="alert-text">
+                        Shutdown Information : <br>
+                        Kubernetes tries to exit applications gracefully, but sometimes this is not possible because the application is stuck in a deadlock for example. In this case Kubernetes just kills the container. 
+                        Kubernetes can not determine if the application is stuck in a deadlock or just needs a long time to shutdown. In this case the user should give the container a longer GracePeroid.
+                    </span>
+                </clr-alert-item>
+            </clr-alert>
+            <p class="m-0 text-justify"><b>How fast does your application typically need to shutdown?</b></p>
+
+            <clr-select-container>
+                <label>Grace Period : </label>
+                <select clrSelect [(ngModel)]="container.containerAdvancedOptions.gracePeriod" name="gracePeriod" required #gracePeriod="ngModel" [ngClass]="{'is-invalid': probeForm.submitted && gracePeriod.invalid}">
+                    <option [value]="0">fast (0 seconds)</option>
+                    <option [value]="15">medium fast (15 seconds)</option>
+                    <option [value]="30">medium (30 seconds)</option>
+                    <option [value]="45">medium slow (45 seconds)</option>
+                    <option [value]="60">slow (60 seconds)</option>
+                    </select>
+               
+                <clr-control-error>This field is required!</clr-control-error>
+              </clr-select-container>
+        </div>
+
+
+        
+         </form>
+    </clr-wizard-page>
+</clr-wizard>

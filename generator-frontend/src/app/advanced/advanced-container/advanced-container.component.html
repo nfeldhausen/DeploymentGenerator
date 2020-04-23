@@ -1,65 +1,749 @@
-<div class="row mb-2">
-    <div class="col">
-        <button type="button" class="btn btn-primary" (click)="addContainer()"><i class="fas fa-plus"></i> Add
-            Container</button>
+    <div class="addButton">
+        <button type="button"  matTooltip="Add new Container" class="btn btn-primary btn-block" (click)="addContainer()"><clr-icon shape="plus-circle" size="20" ></clr-icon>&nbsp;<span mat-line>Add </span> 
+            <span mat-line>Container</span></button>
+    </div>
+
+<div *ngIf="request.containers.length!=0">
+
+    <div class="container"  *ngFor="let container of request.containers" >
+        <div class="clr-row">
+                <div  *ngVar="getDescriptionForContainer(container.name) as containerDescription" class="clr-col card">
+                    <div class="">
+                        <div class="clr-row">
+                        
+    
+                            <h1 class="clr-col-11">{{container.name | uppercase}} Container</h1>
+                            
+                            <h1 class="clr-col-1"><button class="btn btn-icon  btn-warning" style=" font-size: 20px;" matTooltip="Remove this container with all its properties"  (click)="deleteContainer(container)"><clr-icon shape="trash" class="is-solid"></clr-icon></button></h1>
+                        </div> 
+                        <mat-divider></mat-divider>
+    
+                        <small class="my-auto clr-col-12">ID: {{container.uniqueName}}</small><br>
+                        <mat-form-field >
+                            <mat-label><b>Name</b> </mat-label>
+                            <input type="text" matInput [(ngModel)]="container.name" size="45"  placeholder="Name" name="{{container.uniqueName + '-name'}}" #name="ngModel" (ngModelChange)="changeDescriptionName(container.name,containerDescription)" [ngClass]="{'is-invalid': submitted && name.invalid}"
+                            pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" required />                           
+                        </mat-form-field>
+    
+                            
+                        <mat-form-field  >
+                            <mat-label><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.replicas" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.replicas}}"></i><b>Replicas</b></span></mat-label>
+                                <input type="number" matInput [(ngModel)]="container.replicas" placeholder="Replicas"  size="55"name="{{container.uniqueName + '-replicas'}}" #replica="ngModel" [ngClass]="{'is-invalid': submitted && replica.invalid}" required min="1" customMin="1" />
+                            <mat-hint>This field must be a positive number !</mat-hint>
+                        
+    
+                        </mat-form-field>
+    
+                        <mat-form-field >
+                            <mat-label> <span ><i *ngIf="containerDescription?.image" [autoClose]="'outside'" ngbPopover="{{containerDescription.image}}"></i><b>Image</b> </span> </mat-label>
+                            <input type="text" matInput [(ngModel)]="container.image" placeholder="Image" size="45" name="{{container.uniqueName + '-image'}}" #image="ngModel" [ngClass]="{'is-invalid': submitted && image.invalid}" [ngbTypeahead]="search" (ngModelChange)="getImageAnalysis($event, container)"
+                            required />
+                        
+                        </mat-form-field>
+    
+                        <mat-checkbox color="primary" id="{{container.uniqueName}}-advanced" name="{{container.uniqueName}}-advanced" [(ngModel)]="container.advancedOptions">Show Advanced Options</mat-checkbox>
+                      
+                        
+                        
+                    </div>
+                </div>
+    
+            
+            <!-- Add Options Buttons -->
+    
+                <div class="  clr-col">
+                        <div class="clr-row">
+                    
+                            <div class=" clr-col card clickable btnCard " matRipple (click)="openBottomSheet(storage)">
+                                
+                                    <div class="button " style=" border: 2px; "> 
+    
+                                        <div class="icon clr-row">
+                                        <clr-icon shape="control-lun" size="50"   style=" align-items: center; " matBadge="{{container.storage.length}}" [matBadgeHidden]="container.storage.length ==0" ></clr-icon>
+                                    </div>
+                                    
+                                    <div class="text clr-row">
+                                            Add Storage
+                                    </div>
+                                    
+                                    </div>
+    
+                                                                                    
+                                                <ng-template #storage>
+                                                    <mat-nav-list class="center">
+    
+    
+                                                        <button  class="btn btn-outline" mat-list-item (click)="container.addStorage() ;   this._bottomSheet.dismiss();" >
+                                                            <span mat-line>Add new Storage</span>
+                                                            <span mat-line>With Name, Size, Path ...</span>
+                                                        </button>
+    
+                                                        <mat-divider></mat-divider>
+    
+                                                        <button class="btn btn-outline" mat-list-item  [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.mountPaths === null || container.analysis.mountPaths.length === 0" (click)="appendImageMountPaths(container);  this._bottomSheet.dismiss();">
+                                                        <span mat-line>Append Image NountPaths</span>
+                                                        <span mat-line>Add Storage from Image</span>
+                                                        </button>
+                                                    
+                                                     
+                                                
+                                                    </mat-nav-list>
+                                                
+                                                </ng-template>
+    
+                                             
+                                    
+    
+                            </div>
+                            
+                            
+    
+                            <div class=" clr-col  card clickable btnCard"  matRipple  (click)="openBottomSheet(port)">
+      
+    
+                                <div class="button " style=" border: 2px; "> 
+    
+                                    <div class="icon clr-row" >
+                                    <clr-icon shape="disconnect" size="50" matBadge="{{container.ports.length}}" [matBadgeHidden]="container.ports.length ==0"  style=" align-items: center;  "></clr-icon>
+                                </div>
+                                
+                                <div class="text clr-row" >
+                                       Add Port
+                                </div>
+                                
+                                </div>
+    
+                                <ng-template #port>
+                                    <mat-nav-list class="center">
+    
+    
+                                        <button  class="btn btn-outline" mat-list-item (click)="container.addPort();   this._bottomSheet.dismiss();" >
+                                            <span mat-line>Add new Storage</span>
+                                            <span mat-line>With port, TargetPort, Protocol ...</span>
+                                        </button>
+    
+                                        <mat-divider></mat-divider>
+    
+                                        <button class="btn btn-outline" mat-list-item [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.ports === null || container.analysis.ports.length === 0" (click)="appendImagePorts(container)">
+                                        <span mat-line>Append Image Port</span>
+                                        <span mat-line>Add Port from Image</span>
+                                        </button>
+                                    
+                                     
+                                
+                                    </mat-nav-list>
+                                
+                                </ng-template>
+                                
+                                
+                                
+                            </div>
+                        </div>
+                
+                        <div class="clr-row ">
+                            <div class=" clr-col card clickable  btnCard" matRipple  (click)="container.containerAdvancedOptions.addInitContainer()">                                                       
+                                
+                                <div class="button" style=" border: 2px; "> 
+    
+                                    <div class="icon clr-row" >
+                                    <clr-icon shape="data-cluster" size="50"  style=" align-items: center;  "  matBadge="{{container.containerAdvancedOptions.initContainers.length}}" [matBadgeHidden]="container.containerAdvancedOptions.initContainers.length ==0"></clr-icon>
+                                </div>
+                                
+                                <div class="text clr-row" >
+                                        Add Init Container
+                                </div>
+                                
+                                </div>
+    
+                            
+                            </div>
+                            <div class="clr-col card clickable btnCard" matRipple (click)="openBottomSheet(variable)" >
+                              
+                                    <div class="button" style=" border: 2px; "> 
+    
+                                        <div class="icon clr-row">
+                                           <clr-icon shape="import" size="50"  style=" align-items: center;  " matBadge="{{container.environments.length}}" [matBadgeHidden]="container.environments.length ==0" ></clr-icon>
+                                        </div>
+                                    
+                                        <div class="text clr-row">
+                                            Add Environment Variable
+                                        </div>
+    
+                                        <ng-template #variable>
+                                            <mat-nav-list class="center">
+            
+            
+                                                <button  class="btn btn-outline" mat-list-item (click)="container.addEnvironmentVariable();   this._bottomSheet.dismiss();" >
+                                                    <span mat-line>ADD Environement Variable</span>
+                                                    <span mat-line>With Name and Value</span>
+                                                </button>
+            
+                                                <mat-divider></mat-divider>
+            
+                                                <button class="btn btn-outline" mat-list-item  [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.environments === null || container.analysis.environments.length === 0" (click)="appendImageVariables(container)">
+                                                <span mat-line>Append Image Variable</span>
+                                                <span mat-line>Add Variable from Image</span>
+                                                </button>
+                                            
+                                             
+                                        
+                                            </mat-nav-list>
+                                        
+                                        </ng-template>
+                                    
+                                    </div>
+                            </div>
+    
+                        </div>
+    
+                </div>
+    
+            </div>
+        
+       <div class="clr-row"> 
+    
+            <div *ngIf="container.advancedOptions"  class="clr-col-6 card">
+    
+                <h2 class="">Advanced Options</h2>
+                <mat-divider></mat-divider><br>
+    
+                <div class="clr-row">
+                    <clr-checkbox-container class="clr-col-6">
+                        <label>Health Check</label>
+                        <clr-checkbox-wrapper>
+                            <input type="checkbox" clrCheckbox  id="{{container.uniqueName}}-generic" name="{{container.uniqueName}}-generic" [(ngModel)]="container.containerAdvancedOptions.httpService">
+                            <label  for="{{container.uniqueName}}-generic">Container
+                                with HTTP
+                                Service</label>
+                        
+                        </clr-checkbox-wrapper>
+                    </clr-checkbox-container>
+                    
+                    <div class="clr-col-6">
+    
+                        <div  *ngIf="container.containerAdvancedOptions.livenessProbe === null || container.containerAdvancedOptions.livenessProbe === undefined">
+                            <button type="button" class="btn btn-outline btn-sm" style="color: grey;" (click)="container.containerAdvancedOptions.switchLivenessProbe()">Define seperate
+                                Liveness Check</button>
+                        </div>
+                        <div  *ngIf="container.containerAdvancedOptions.livenessProbe !== null && container.containerAdvancedOptions.livenessProbe !== undefined">
+                            <button type="button" class="btn btn-outline btn-sm" style="color: grey;" (click)="container.containerAdvancedOptions.switchLivenessProbe()">Delete seperate
+                                Liveness Check</button>
+                        </div>
+                    </div>
+    
+                </div>
+            
+                <br>
+    
+                <div class="clr-row" >
+    
+    
+                    <div class="clr-col-6">
+                        <h3 >Readiness Check</h3>
+                        <div>
+                            <label for="{{container.uniqueName + '-rpInitialThreshold'}}"><i
+                                class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.initial"
+                                [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.readiness.initial}}"></i><b>Start Checking
+                            After:
+                            {{container.containerAdvancedOptions.readinessProbe.initialDelaySeconds}}</b></label>
+                            <br>
+                            
+                        <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" id="{{container.uniqueName + '-rpInitialThreshold'}}" name="{{container.uniqueName + '-rpInitialThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.getReadinessProbe().initialDelaySeconds" min="0" max="100"></mat-slider>
+                        
+                        </div>
+                            
+                        <div>
+                            <label for="{{container.uniqueName + '-rpPeriodSeconds'}}"><i
+                                class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.period"
+                                [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.readiness.period}}"></i><b>Check Interval:
+                            {{container.containerAdvancedOptions.readinessProbe.periodSeconds}}</b></label><br>
+                            
+                            <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000" id="{{container.uniqueName + '-rpPeriodSeconds'}}" name="{{container.uniqueName + '-rpPeriodSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.periodSeconds" min="1" max="100"></mat-slider>
+    
+    
+                        </div>
+                            
+                            <div>
+                                        <label for="{{container.uniqueName + '-rpSuccessThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.success"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.success}}"></i><b>Healthy After:
+                                    {{container.containerAdvancedOptions.readinessProbe.successThreshold}}</b></label><br>
+                                    <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"  id="{{container.uniqueName + '-rpSuccessThreshold'}}" name="{{container.uniqueName + '-rpSuccessThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.successThreshold" min="1" max="100"></mat-slider>
+                            </div>
+                        
+                            <div>
+                                <label for="{{container.uniqueName + '-rpTimeoutSeconds'}}"><i
+                                    class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.timeout"
+                                    [autoClose]="'outside'"
+                                    ngbPopover="{{containerDescription.readiness.timeout}}"></i> <b> Check Timeout:
+                                {{container.containerAdvancedOptions.readinessProbe.timeoutSeconds}}</b></label><br>
+                                
+                                <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"  id="{{container.uniqueName + '-rpTimeoutSeconds'}}" name="{{container.uniqueName + '-rpTimeoutSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.timeoutSeconds" min="1" max="100"></mat-slider>
+    
+    
+                            </div>                                  
+                                
+                            <div>
+                                <label class="required" for="{{container.uniqueName + '-rpFailureThreshold'}}"><i
+                                    class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.failure"
+                                    [autoClose]="'outside'"
+                                    ngbPopover="{{containerDescription.readiness.failure}}"></i> <b>Unhealthy After:
+                                {{container.containerAdvancedOptions.readinessProbe.failureThreshold}}</b></label><br>
+                            
+                                <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"  id="{{container.uniqueName + '-rpFailureThreshold'}}" name="{{container.uniqueName + '-rpFailureThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.failureThreshold" min="1" max="100"></mat-slider>
+                            
+                            </div>
+                            <div *ngIf="!container.containerAdvancedOptions.httpService">
+                                <mat-form-field >
+                                    <mat-label><b><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.readiness?.tcpPort" [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.tcpPort}}"></i>TCP Port</span></b></mat-label>
+                                        <input type="number" matInput placeholder="Probes not included if not set" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-rpTcpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.tcpPort"
+                            #rpTcpPort="ngModel" [ngClass]="{'is-invalid': submitted && rpTcpPort.invalid}" />
+                                    <mat-hint>Minimum Value is 1 and max Value is 65535</mat-hint>
+                                
+                                </mat-form-field>
+                            </div>
+                            <div *ngIf="container.containerAdvancedOptions.httpService">
+                                <mat-form-field>
+                                    <mat-label> <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.readiness?.httpPath"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.httpPath}}"></i><b>HTTP
+                                    Path</b></span></mat-label>
+                                    <input type="text" matInput placeholder="" name="{{container.uniqueName }}-rpHttpPath" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpAction" #rphttpAction="ngModel" [ngClass]="{'is-invalid': submitted && rphttpAction.invalid}"
+                                />
+                                <mat-hint>Probes not included if not set</mat-hint>
+                                </mat-form-field>
+    
+                            </div>
+                            <div *ngIf="container.containerAdvancedOptions.httpService">
+    
+                                <mat-form-field >
+                                    <mat-label> <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.readiness?.httpPort"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.httpPort}}"></i><b>HTTP
+                                    Port</b></span></mat-label>
+                                    <input type="number" matInput placeholder="Defaults to: 80" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-rpHttpPort" [(ngModel)]="container.containerAdvancedOptions.readinessProbe.httpPort" #rpHttpPort="ngModel"
+                                    [ngClass]="{'is-invalid': submitted && rpHttpPort.invalid}" />
+                                    <mat-hint>Minimum Value is 1 and max Value is 65535</mat-hint>
+                                </mat-form-field>
+                            
+                            
+                            
+                            
+                            
+                                </div>
+                        
+                    </div>
+    
+    
+                    <div class="clr-col-6" *ngIf="container.containerAdvancedOptions.livenessProbe">
+                        <h3 >Liveness Check</h3>
+                        <div>
+                            <label for="{{container.uniqueName + '-lPeriodSeconds'}}"><i
+                                class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.period"
+                                [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.liveness.period}}"></i><b>Start Checking
+                            After:
+                            {{container.containerAdvancedOptions.livenessProbe.initialDelaySeconds}}</b></label>
+                            <br>
+                            
+                        <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"   id="{{container.uniqueName + '-lInitialThreshold'}}" name="{{container.uniqueName + '-lInitialThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.initialDelaySeconds" min="0" max="100"></mat-slider>
+                        
+                        </div>
+                            
+                        <div>
+                            <label for="{{container.uniqueName + '-lSuccessThreshold'}}"><i
+                                class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.success"
+                                [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.liveness.success}}"></i><b>Check Interval:
+                                    {{container.containerAdvancedOptions.livenessProbe.periodSeconds}}</b></label><br>
+                            
+                            <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"  id="{{container.uniqueName + '-lPeriodSeconds'}}" name="{{container.uniqueName + '-lPeriodSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.periodSeconds" min="1" max="100"></mat-slider>
+    
+    
+                        </div>
+                            
+                            <div>
+                                        <label for="{{container.uniqueName + '-rpSuccessThreshold'}}"><i
+                                        class="fas fa-info-circle mr-1" *ngIf="containerDescription?.readiness?.success"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.readiness.success}}"></i><b>Healthy After:
+                                            {{container.containerAdvancedOptions.livenessProbe.successThreshold}}</b></label><br>
+                                    <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"   id="{{container.uniqueName + '-lSuccessThreshold'}}" name="{{container.uniqueName + '-lSuccessThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.successThreshold" min="1" max="100"></mat-slider>
+                            </div>
+                        
+                            <div>
+                                <label for="{{container.uniqueName + '-lTimeoutSeconds'}}"><i
+                                    class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.timeout"
+                                    [autoClose]="'outside'"
+                                    ngbPopover="{{containerDescription.liveness.timeout}}"></i> <b> Check Timeout:
+                                        {{container.containerAdvancedOptions.livenessProbe.timeoutSeconds}}</b></label><br>
+                                
+                                <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"   id="{{container.uniqueName + '-lTimeoutSeconds'}}" name="{{container.uniqueName + '-lTimeoutSeconds'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.timeoutSeconds" min="1" max="100"></mat-slider>
+    
+    
+                            </div>                                  
+                                
+                            <div>
+                                <label for="{{container.uniqueName + '-lFailureThreshold'}}"><i
+                                    class="fas fa-info-circle mr-1" *ngIf="containerDescription?.liveness?.failure"
+                                    [autoClose]="'outside'"
+                                    ngbPopover="{{containerDescription.liveness.failure}}"></i> <b>Unhealthy After:
+                                        {{container.containerAdvancedOptions.livenessProbe.failureThreshold}}</b></label><br>
+                            
+                                <mat-slider thumbLabel [displayWith]="formatLabel" tickInterval="1000"  id="{{container.uniqueName + '-lFailureThreshold'}}" name="{{container.uniqueName + '-lFailureThreshold'}}" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.failureThreshold" min="1" max="100"></mat-slider>
+                            
+                            </div>
+                            <div *ngIf="!container.containerAdvancedOptions.httpService">
+                                <mat-form-field >
+                                    <mat-label><b> <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.liveness?.tcpPort" [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.tcpPort}}"></i>TCP Port</span></b></mat-label>
+                                        <input type="number" matInput placeholder="Probes not included if not set" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-lTcpPort" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.tcpPort"
+                                        #lTcpPort="ngModel" [ngClass]="{'is-invalid': submitted && lTcpPort.invalid}" />
+                                    <mat-hint>Minimum Value is 1 and max Value is 65535</mat-hint>
+                                
+                                </mat-form-field>
+                            </div>
+    
+                            <div *ngIf="container.containerAdvancedOptions.httpService">
+                                <mat-form-field>
+                                    <mat-label>  <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.liveness?.httpPath"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.httpPath}}"></i><b>HTTP
+                                    Path</b></span></mat-label>
+                                    <input type="text" matInput placeholder="Probes not included if not set" name="{{container.uniqueName }}-lHttpPath" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.httpAction" #lhttpAction="ngModel" [ngClass]="{'is-invalid': submitted && lhttpAction.invalid}"
+                                    />
+                                <mat-hint>Probes not included if not set</mat-hint>
+                                </mat-form-field>
+    
+                            </div>
+                            <div *ngIf="container.containerAdvancedOptions.httpService">
+    
+                                <mat-form-field >
+                                    <mat-label> <span class="input-group-text" id="test"><i class="fas fa-info-circle mr-1"
+                                        *ngIf="containerDescription?.liveness?.httpPort"
+                                        [autoClose]="'outside'"
+                                        ngbPopover="{{containerDescription.liveness.httpPort}}"></i><b>HTTP
+                                    Port</b></span></mat-label>
+                                    <input type="number" matInput placeholder="Defaults to: 80" min="1" customMin="1" max="65535" customMax="65535" name="{{container.uniqueName }}-lHttpPort" [(ngModel)]="container.containerAdvancedOptions.livenessProbe.httpPort" #lHttpPort="ngModel"
+                                    [ngClass]="{'is-invalid': submitted && lHttpPort.invalid}" aria-describedby="test" />
+                                    <mat-hint>Minimum Value is 1 and max Value is 65535</mat-hint>
+                                </mat-form-field>
+                            
+                            
+                            
+                            
+                            
+                                </div>
+    
+                        
+                    </div>
+                </div>
+                <mat-divider></mat-divider><br>
+    
+                <div class="clr-row">
+                    <div class="clr-col-6">
+                        <h2 >Requests/Limits</h2>
+                    </div>
+                    <div class="clr-col-6">
+                        <button type="button" class="btn btn-sm" (click)="container.containerAdvancedOptions.setStandardValues()">Set Limits/Defaults to Standard Values</button>
+                    </div>
+                </div>
+    
+                <div class="clr-row">
+    
+                
+    
+                    <div class="clr-col-6">
+                        <h4>Requests</h4>
+    
+                        <mat-form-field >
+                            <mat-label><b> <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.requests?.cpu" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.requests.cpu}}"></i>CPU
+                            Request</span></b></mat-label>
+                            <input type="number" matInput placeholder="Defaults to: 0.1" step="0.005" min="0.005" customMin="0.005" name="{{container.uniqueName }}-rCpu" [(ngModel)]="container.containerAdvancedOptions.requests.cpu" #rCPU="ngModel" [ngClass]="{'is-invalid': submitted && rCPU.invalid}"
+                            />
+                            <mat-hint> Minimum Value is 0.005 and must be lower than CPU Limit</mat-hint>
+    
+                        </mat-form-field><br>
+    
+    
+                        <mat-form-field >
+                            <mat-label><b><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.requests?.memory" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.requests.memory}}"></i>Memory
+                            Request(MB)</span></b></mat-label>
+                            <input type="number" matInput placeholder="Defaults to: 256Mi" min="4" customMin="4" name="{{container.uniqueName }}-rMemory" [(ngModel)]="container.containerAdvancedOptions.requests.memory" #rMemory="ngModel" [ngClass]="{'is-invalid': submitted && rMemory.invalid}"
+                        />
+                        <mat-hint>Minimum Value is 4 and must be lower than Memory Limit</mat-hint>
+                        </mat-form-field>
+                    </div>
+    
+    
+                <div class="clr-col-6">
+                        <h4>Limits</h4>
+    
+                        <mat-form-field >
+                            <mat-label><b><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.limits?.cpu" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.limits.cpu}}"></i>CPU
+                            Limit</span></b></mat-label>
+                            <input type="number" matInput placeholder="Defaults to: 0.1" step="0.005" min="{{container.containerAdvancedOptions.requests.cpu || 0.005}}" customMin="{{container.containerAdvancedOptions.requests.cpu || 0.005}}" name="{{container.uniqueName }}-lCpu"
+                            [(ngModel)]="container.containerAdvancedOptions.limits.cpu" #lCPU="ngModel" [ngClass]="{'is-invalid': submitted && lCPU.invalid}" />
+                            <mat-hint> Minimum Value is 0.005 and must be higher or equal than cpu request</mat-hint>
+    
+                        </mat-form-field><br>
+    
+    
+                        <mat-form-field >
+                            <mat-label><b><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="containerDescription?.limits?.memory" [autoClose]="'outside'"
+                                ngbPopover="{{containerDescription.limits.memory}}"></i>Memory
+                            Limit(MB)</span></b></mat-label>
+                            <input type="number" matInput placeholder="Defaults to: 256Mi" min="{{container.containerAdvancedOptions.requests.memory || 4}}" customMin="{{container.containerAdvancedOptions.requests.memory || 4}}" name="{{container.uniqueName }}-lMemory"
+                            [(ngModel)]="container.containerAdvancedOptions.limits.memory" #lMemory="ngModel" [ngClass]="{'is-invalid': submitted && lMemory.invalid}" />
+                            <mat-hint>Minimum Value is 4 and must be higher or equal than memory request</mat-hint>
+                        </mat-form-field>
+    
+                </div>
+    
+    
+                </div>
+                <mat-divider></mat-divider>
+                <br>
+                
+                        
+                
+            
+    
+                
+    
+                
+                
+            </div>
+    
+            <div class="clr-col clr-row adds" >
+    
+                <div  *ngFor="let variable of container.environments.slice().reverse()" class=" clr-col-12 card" >
+    
+                    <div class="clr-row">
+                        <h2 class="clr-col-11">Environment Variable</h2>
+                        <div class="clr-col-1">  
+                            <button type="button" class="btn btn-icon btn-danger" (click)="container.deleteEnvironmentVariable(variable)"><clr-icon shape="trash"></clr-icon></button>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    
+                    <div  *ngVar="getObjectFromDescription(containerDescription?.env, variable.name) as environmentDescription">  
+    
+                    
+                        <mat-form-field >
+                            <mat-label><span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                *ngIf="environmentDescription" [autoClose]="'outside'"
+                                ngbPopover="{{environmentDescription.description}}"></i>Name</span></mat-label>
+                            <input type="text" matInput [(ngModel)]="variable.name" name="{{variable.uniqueName + '-name'}}" #envname="ngModel" placeholder="Name" [ngClass]="{'is-invalid': submitted && envname.invalid}" pattern="[-._a-zA-Z][-._a-zA-Z0-9]*" required
+                                />
+                            <mat-hint> Environment varibale name can not be empty and must follow the pattern: [-._a-zA-Z][-._a-zA-Z0-9]*</mat-hint>
+                            
+                        </mat-form-field>
+    
+                        <mat-form-field >
+                            <mat-label><span class="input-group-text">Value</span></mat-label>
+                                <input [type]="variable.secret ? 'password' : 'text'" matInput [(ngModel)]="variable.value" name="{{variable.uniqueName + '-value'}}" #envvalue="ngModel" placeholder="Value" [ngClass]="{'is-invalid': submitted && envvalue.invalid}" />
+                            <mat-hint>Environment Value can not be empty</mat-hint>
+                            
+                        </mat-form-field>
+    
+                        <mat-checkbox color="primary"name="{{variable.uniqueName + '-secret'}}" id="{{variable.uniqueName + '-secret'}}" [(ngModel)]="variable.secret">Secret  </mat-checkbox>
+    
+                    </div>
+    
+                   
+                </div>
+    
+                <div *ngFor="let port of container.ports.slice().reverse()" class="card  clr-col-12" >
+                    <div class="clr-row">
+                        <h2 class="clr-col-11">PORTS</h2>
+                        <div class="clr-col-1">  
+                            <button type="button" class="btn btn-icon  btn-warning" matTooltip="Delete this port" (click)="container.deletePort(port)"><clr-icon shape="trash"></clr-icon></button>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <mat-form-field >
+                        <mat-label >
+                            <span *ngVar="getObjectFromDescription(containerDescription?.port, port.name) as portDescription" class="input-group-text"><i class="fas fa-info-circle mr-1"
+                                    *ngIf="portDescription" [autoClose]="'outside'"
+                                    ngbPopover="{{portDescription.description}}"></i><b>Name</b></span></mat-label>
+                                    <input type="text" matInput [(ngModel)]="port.name" name="{{port.uniqueName + '-name'}}" #portname="ngModel" [ngClass]="{'is-invalid': submitted && portname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" placeholder="Name" nullValue />
+                        <mat-hint> Port name must follow the pattern: [a-z0-9]([-a-z0-9]*[a-z0-9])? and should be set when more than two ports are used</mat-hint>
+                        
+                    </mat-form-field>
+    
+                    <mat-form-field >
+                        <mat-label ><b>Port</b></mat-label>
+                        <input type="number" matInput [(ngModel)]="port.port" name="{{port.uniqueName + '-port'}}" #portvalue="ngModel" placeholder="1-65535" min="1" max="65535" [ngClass]="{'is-invalid': submitted && portvalue.invalid}" required customMin="1" customMax="65535"
+                        />
+                        <mat-hint>   Port number must be a number between 1 and 65535</mat-hint>
+                        
+                    </mat-form-field>
+    
+                    <mat-form-field >
+                        <mat-label ><b>TargetPort</b></mat-label>
+                        <input type="number" matInput [(ngModel)]="port.targetPort" name="{{port.uniqueName + '-targetPort'}}" #tPortvalue="ngModel" placeholder="Defaults to: port" min="1" max="65535" [ngClass]="{'is-invalid': submitted && tPortvalue.invalid}" customMin="1"
+                        customMax="65535" />
+                        <mat-hint>   Port number must be a number between 1 and 65535</mat-hint>
+                        
+                    </mat-form-field>
+    
+                
+    
+                    <mat-form-field>
+                        <mat-label><b>Protocol</b></mat-label>
+                        <select matNativeControl [(ngModel)]="port.protocol" name="{{port.uniqueName + '-protocol'}}" #portproto="ngModel" [ngClass]="{'is-invalid': submitted && portproto.invalid}" required>
+                            <option>TCP</option>
+                            <option>UDP</option>
+                        </select>
+                      </mat-form-field>
+    
+                    <div *ngIf="container.ports.length" >
+                        
+    
+                        <mat-form-field>
+                            <mat-label>Type</mat-label>
+                            <select matNativeControl name="{{container.uniqueName + '-exposeType'}}" [(ngModel)]="container.exposeType">
+                                <option value="NodePort">NodePort</option>
+                                <option value="LoadBalancer">LoadBalancer</option>
+                            </select>
+                          </mat-form-field>
+    
+                          <mat-checkbox color="primary" name="{{container.uniqueName + '-expose'}}" id="{{container.uniqueName + '-expose'}}" [(ngModel)]="container.expose">Expose
+                            Container
+                            with
+                            ServiceType:</mat-checkbox>
+    
+                        
+                    </div>
+    
+    
+    
+                </div>
+    
+                <div *ngFor="let storage of container.storage.slice().reverse()" class="card clr-col-12 "  >
+                    
+    
+                    <div class="clr-row">
+                        <h2 class="clr-col-11">STORAGE</h2>
+                        <div class="clr-col-1">  
+                            <button type="button" class="btn btn-icon  btn-warning" matTooltip="Delete this Storage"(click)="container.deleteStorage(storage)"><clr-icon shape="trash"></clr-icon></button>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class=" clr-row">
+                            <div mat-dialog-content>
+                                <mat-form-field >
+                                    <mat-label *ngVar="getObjectFromDescription(containerDescription?.storage, storage.name) as storageDescription">
+                                        <span ><i class="fas fa-info-circle mr-1"
+                                                *ngIf="storageDescription" [autoClose]="'outside'"
+                                                ngbPopover="{{storageDescription.description}}"></i>Name</span></mat-label>
+                                                <input type="text" matInput placeholder="Name of the storage" name="{{storage.uniqueName + '-name'}}" [(ngModel)]="storage.name" #sname="ngModel" [ngClass]="{'is-invalid': submitted && sname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?"
+                                                nullValue />
+                                    <mat-hint>Name must follow the pattern: [a-z0-9]([-a-z0-9]*[a-z0-9])?</mat-hint>
+                                </mat-form-field>
+                                
+                                <mat-form-field >
+                                    <mat-label >Size</mat-label>
+                                    <input type="number" matInput placeholder="Size in Mb" name="{{storage.uniqueName + '-size'}}" [(ngModel)]="storage.size" #ssize="ngModel" [ngClass]="{'is-invalid': submitted && ssize.invalid}" required min="1" customMin="1" />
+                                    <mat-hint>Size can not be 0 or less than 0</mat-hint>
+                                    <mat-error>
+                                        This field is required !
+                                    </mat-error>
+                                </mat-form-field>
+                                <br>                                                    
+    
+                                <div *ngFor="let mount of storage.storageMounts" >
+                                
+                                        
+                                    <mat-form-field >
+                                        <mat-label >Mountpath</mat-label>
+                                        <input type="text" matInput [(ngModel)]="mount.mountPath" name="{{mount.uniqueName + '-mountPath'}}" #mPath="ngModel" placeholder="absolute MountPath" [ngClass]="{'is-invalid': submitted && mPath.invalid}" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" required />
+        
+                                        <mat-hint >
+                                            This field is required and must be an absolute path!
+                                        </mat-hint>
+                                    </mat-form-field>
+    
+                                    <mat-form-field >
+                                        <mat-label >Subpath</mat-label>
+                                        <input type="text" matInput [(ngModel)]="mount.subPath" name="{{mount.uniqueName + '-subPath'}}" #msubPath="ngModel" placeholder="relative SubPath" [ngClass]="{'is-invalid': submitted && msubPath.invalid}" pattern="([a-z]|[A-Z]|[0-9]){1}([a-z]|[A-Z]|[0-9]|\/)*" />                                                        
+        
+                                      
+                                         <mat-hint >
+                                            This field is required and must be an relative path!
+                                        </mat-hint> 
+                                    </mat-form-field>                                                                                    
+                                
+                                    <button class="btn btn-primary" (click)="storage.mountManipulation($event, mount)"><i  class="fas fa-plus"></i></button>                                                                                      
+                                    
+                                </div>                            
+                            </div>                        
+                    </div>
+                </div>
+    
+                <div *ngFor="let initContainer of container.containerAdvancedOptions.initContainers" class="card  clr-col-12">
+                    
+                    <div class="clr-row">
+                        <h2 class="clr-col-11">INIT CONTAINER</h2>
+                        
+                        <div class="clr-col-1">  
+                            <button type="button" class="btn btn-icon  btn-warning" matTooltip="delete this Init Container " (click)="container.containerAdvancedOptions.deleteInitContainer(initContainer)"><clr-icon shape="trash"></clr-icon></button>
+                        </div>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <mat-form-field >
+                        <mat-label><span >Command</span></mat-label>
+                        <input type="text" matInput placeholder="Command" [(ngModel)]="initContainer.command" name="{{initContainer.uniqueName}}-command" #initCommand="ngModel" [ngClass]="{'is-invalid': submitted && initCommand.invalid}" required>
+                        <mat-hint>Command must be set!</mat-hint>
+                        
+                    </mat-form-field>
+                    
+                    <mat-form-field >
+                        <mat-label><span >MountPath</span></mat-label>
+                        <input type="text" matInput placeholder="Absolute MountPath" [(ngModel)]="initContainer.mountPath" name="{{initContainer.uniqueName}}-mountPath" pattern="\/([a-z]|[A-Z]|[0-9]|\/)+" #initMount="ngModel" [ngClass]="{'is-invalid': submitted && initMount.invalid}">
+                        <mat-hint>Path must be an absolute path</mat-hint>
+                        
+                    </mat-form-field>
+                    
+                    <mat-checkbox color="primary" name="{{initContainer.uniqueName + '-privileged'}}" id="{{initContainer.uniqueName + '-privileged'}}" [(ngModel)]="initContainer.privileged">Privileged</mat-checkbox>
+    
+                </div>
+                
+            </div>
+    
+        </div>
+    
+    
     </div>
 </div>
+
+
+<!-- 
 <div class="row p-2 border border-dark mb-2" *ngFor="let container of request.containers" [@enterAnimation]>
     <div class="col" *ngVar="getDescriptionForContainer(container.name) as containerDescription">
         <div class="row">
             <div class="col">
-                <div class="row mb-2">
-                    <div class="col-9">
-                        <div class="row">
-                            <div class="col-6 my-auto">
-                                <h2 class="font-weight-bold text-truncate my-auto"><i class="fas fa-info-circle" *ngIf="containerDescription?.description" [autoClose]="'outside'" ngbPopover="{{containerDescription.description}}"></i> {{container.name | uppercase}} Container
-                                </h2>
-                            </div>
-                            <div class="col-6 my-auto text-muted">
-                                <small class="my-auto">ID: {{container.uniqueName}}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-3 my-auto">
-                        <button type="button" (click)="deleteContainer(container)" class="btn btn-danger float-right"><i
-                                class="fas fa-trash-alt"></i> Delete
-                            Container</button>
-                    </div>
-                </div>
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Name*</span>
-                    </div>
-                    <input type="text" class="form-control" [(ngModel)]="container.name" placeholder="Name" name="{{container.uniqueName + '-name'}}" #name="ngModel" (ngModelChange)="changeDescriptionName(container.name,containerDescription)" [ngClass]="{'is-invalid': submitted && name.invalid}"
-                        pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?" required />
-                    <div class="invalid-feedback">
-                        Container name can not be empty.
-                    </div>
-                </div>
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
-                                *ngIf="containerDescription?.image" [autoClose]="'outside'"
-                                ngbPopover="{{containerDescription.image}}"></i>Image*</span>
-                    </div>
-                    <input type="text" class="form-control" [(ngModel)]="container.image" placeholder="Image" name="{{container.uniqueName + '-image'}}" #image="ngModel" [ngClass]="{'is-invalid': submitted && image.invalid}" [ngbTypeahead]="search" (ngModelChange)="getImageAnalysis($event, container)"
-                        required />
-                    <div class="invalid-feedback">
-                        Container image can not be empty.
-                    </div>
-                </div>
-                <div class="input-group mb-2">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text"><i class="fas fa-info-circle mr-1"
-                                *ngIf="containerDescription?.replicas" [autoClose]="'outside'"
-                                ngbPopover="{{containerDescription.replicas}}"></i>Replicas*</span>
-                    </div>
-                    <input type="number" class="form-control" [(ngModel)]="container.replicas" placeholder="Replicas" name="{{container.uniqueName + '-replicas'}}" #replica="ngModel" [ngClass]="{'is-invalid': submitted && replica.invalid}" required min="1" customMin="1"
-                    />
-                    <div class="invalid-feedback">
-                        Container replicas can not be empty and must be a positive number.
-                    </div>
-                </div>
+       
+        
                 <div class="form-row mb-2">
                     <div class="col my-auto">
                         <h3 class="my-auto">Persistent Storage</h3>
@@ -69,20 +753,18 @@
                             <button type="button" class="btn btn-primary float-right" [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.mountPaths === null || container.analysis.mountPaths.length === 0" (click)="appendImageMountPaths(container)"><span class="spinner-border spinner-border-sm"
                                     role="status" aria-hidden="true" *ngIf="container.loadingAnalysis"></span> Append
                                 Image MountPaths</button>
-                            <button type="button" class="btn btn-primary float-right" (click)="container.addStorage()"><i
-                                    class="fas fa-plus"></i> Add
-                                Storage</button>
+                            <button type="button" class="btn btn-primary float-right" (click)="container.addStorage()"><i class="fas fa-plus"></i> Add <br>Storage</button>
                         </div>
                     </div>
                 </div>
                 <div class="form-row" *ngFor="let storage of container.storage" [@enterAnimation]>
                     <div class="col-3">
                         <div class="input-group">
-                            <div class="input-group-prepend" *ngVar="getObjectFromDescription(containerDescription?.storage, storage.name) as storageDescription">
-                                <span class="input-group-text"><i class="fas fa-info-circle mr-1"
+                            <label  *ngVar="getObjectFromDescription(containerDescription?.storage, storage.name) as storageDescription">
+                                <span ><i class="fas fa-info-circle mr-1"
                                         *ngIf="storageDescription" [autoClose]="'outside'"
                                         ngbPopover="{{storageDescription.description}}"></i>Name</span>
-                            </div>
+                                </label>
                             <input type="text" class="form-control" placeholder="Name of the storage" name="{{storage.uniqueName + '-name'}}" [(ngModel)]="storage.name" #sname="ngModel" [ngClass]="{'is-invalid': submitted && sname.invalid}" pattern="[a-z0-9]([-a-z0-9]*[a-z0-9])?"
                                 nullValue />
                             <div class="invalid-feedback">
@@ -146,8 +828,7 @@
                     </div>
                     <div class="col-auto">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-primary float-right" [disabled]="container.loadingAnalysis || container.analysis === null || container.analysis.environments === null || container.analysis.environments.length === 0" (click)="appendImageVariables(container)"><span class="spinner-border spinner-border-sm"
-                                    role="status" aria-hidden="true" *ngIf="container.loadingAnalysis"></span> Append
+                            <button type="button" class="btn btn-primary float-right"></span> Append
                                 Image Variables</button>
                             <button type="button" class="btn btn-primary float-right" (click)="container.addEnvironmentVariable()"><i class="fas fa-plus"></i> Add
                                     Variable</button>
@@ -630,4 +1311,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

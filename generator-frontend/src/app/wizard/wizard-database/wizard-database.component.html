@@ -1,5 +1,211 @@
-<form #databaseForm="ngForm" (ngSubmit)="submitted = true; databaseForm.valid && getNextPage()" [@blockInitialRenderAnimation]>
-    <div class="row mb-1">
+<form #databaseForm="ngForm" clrLayout="horizontal" clrLabelSize="6" clrForm (ngSubmit)="submitted = true; databaseForm.valid && getNextPage()" [@blockInitialRenderAnimation]>
+<div class="clr-row center">
+    <div class="clr-col-lg-12 clr-col-12">
+        <div class="card">
+            <div class="card-header">
+                <h2>  <span *ngIf="!mainWizardOptions.editDatabase"> NEW</span>   <span *ngIf="mainWizardOptions.editDatabase"> EDIT</span>  DATABASE <img src="../../../assets/images/Illustration5.png" height="50" width="40"></h2>
+            </div>
+            <div class="card-block">
+
+               
+                
+
+                
+                <div class="card-text"  class="clr-row">
+                    
+                    <div  class="clr-col-8" >
+                    
+                        <div class="card-title">
+                            <h3>Database Information!</h3>
+                        </div>
+                        <p> 
+                            One of your containers need a database to store important data. The wizard supports deploying MYSQL,
+                            MARIADB, redis, postgres, mongodb, couchdb with little to no configuration If you want to deploy a database for your
+                            application, choose the image and size below. The supported environment variables can be changed to your likeings.
+                        
+                        </p>
+                        <br>
+                        
+                            <div>
+
+                            
+                            
+                                <clr-input-container>
+                                    <label>How should your database be called?</label>
+                                    <input clrInput type="text" placeholder="database name" [(ngModel)]="database.name" name="dbName" pattern="([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]" required name="{{database.uniqueName + '-name'}}" #name="ngModel" [ngClass]="{'is-invalid': submitted && name.invalid}">    
+                                    <clr-control-error>This field is required!</clr-control-error>
+                                </clr-input-container>
+                             
+                                <clr-input-container>
+                                    <label>How large should this database be?</label>
+                                    <input clrInput type="number" class="form-control" placeholder="Size" name="dbSize" [(ngModel)]="database.size" min="1" customMin="1" required #size="ngModel" [ngClass]="{'is-invalid': submitted && size.invalid}">
+                                    <clr-control-error>This field is required and must be a positive number!</clr-control-error>
+                                </clr-input-container>
+                          
+                                <clr-select-container>
+                                    <label>Which database do you want to deploy? </label>
+                                    <select clrSelect  aria-placeholder="Database Image" [(ngModel)]="database.image" name="dbImage" (ngModelChange)="setEnvironmentsForDatabase(database)" required #image="ngModel" [ngClass]="{'is-invalid': submitted && image.invalid}">
+                                        <option *ngIf="!mainWizardOptions.editDatabase && !mainWizardOptions.addDatabase">NONE</option>
+                                        <option *ngFor="let dbConfig of databaseConfigurations" [ngValue]="dbConfig.name">{{dbConfig.name}}
+                                        </option>
+                                    </select>
+                                    <clr-control-helper>Choose none, if you do not wish to deploy a database within Kubernetes and click continue</clr-control-helper>
+                                    <clr-control-error>This field is required!</clr-control-error>
+                                </clr-select-container>
+                             
+                            
+                                
+
+                            </div>
+
+                            <div *ngIf="database.environments.length" [@enterAnimation]>
+                                <div class="alert alert-info" role="alert">
+                                    <div class="alert-items">
+                                        <div class="alert-item static">
+                                            <div class="alert-icon-wrapper">
+                                                <clr-icon class="alert-icon" shape="info-circle"></clr-icon>
+                                            </div>
+                                            <span class="alert-text">
+                                                The following Environment Variables can be changed to configure the database. The default values are autogenerated and should be changed.
+                                            </span>
+                                        
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                    
+                                <div  *ngFor="let variable of database.environments" [@fastEnterAnimation]>
+                                    <form >
+                                        <clr-input-container>
+                                            <label>{{variable.name}}</label>
+                                            <input clrInput type="text"  [(ngModel)]="variable.value" name="{{variable.uniqueName}}-value" #envVar="ngModel" [ngClass]="{'is-invalid': submitted && envVar.invalid}" required>
+                                            <clr-control-error>This field is required !</clr-control-error>
+                                        </clr-input-container>
+
+                                    </form>
+                                  
+                                </div>
+                          </div>
+
+                    </div>
+                    <div class="clr-col">
+
+                        <ul class="clr-timeline  clr-timeline-vertical">
+                        
+                            <li class="clr-timeline-step">  
+                                <div class="clr-timeline-step-header">Welcome</div>
+                                <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                                <div class="clr-timeline-step-body">
+                                    <span class="clr-timeline-step-title">Information </span>
+                                    <span class="clr-timeline-step-description">Read the information carefully <br> and click on the start button</span>
+                                  </div>
+                              </li>
+                            <li class="clr-timeline-step">
+                              <div class="clr-timeline-step-header">Step 1</div>
+                              <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                              <div class="clr-timeline-step-body">
+                                <span class="clr-timeline-step-title"> Container </span>
+                                <span class="clr-timeline-step-description">
+                                    A modal dialog will open <br>  Read the information and fill in the corresponding fields
+                              <br>
+                                <div class="btn-group btn-sm">
+                                <button class="btn btn-sm ">Add </button>
+                                <button class="btn btn-sm ">Edit</button>
+                                </div>
+                            </span>
+                              </div>
+                            </li>
+                            <li class="clr-timeline-step">
+                                <div class="clr-timeline-step-header">Step 2</div>
+                                <clr-icon shape="dot-circle" aria-current="true" aria-label="Current"></clr-icon>
+                                <div class="clr-timeline-step-body">
+                                  <span class="clr-timeline-step-title"> Database </span>
+                                  <span class="clr-timeline-step-description">
+                                    Read the information and fill in the corresponding fields
+                                 <br>
+                                <div class="btn-group btn-sm">
+                                <button class="btn btn-sm "  (click)="submitType = 'ADD'; getNextPage()">Add </button>
+                                <button class="btn btn-sm ">Edit</button>
+                                </div>
+                              </span>
+                                </div>
+                              </li>
+                              <li class="clr-timeline-step disabled">
+                                <div class="clr-timeline-step-header">Step 3</div>
+                                <clr-icon shape="circle" aria-label="Not started" ></clr-icon>
+                                <div class="clr-timeline-step-body">
+                                  <span class="clr-timeline-step-title"> Link </span>
+                                  <span class="clr-timeline-step-description">
+                                    Read the information and fill in the corresponding fields 
+                               
+                              </span>
+                                </div>
+                              </li>
+                            <!-- <li class="clr-timeline-step">    Progress
+                              <div class="clr-timeline-step-header">Step 2</div>
+                              <clr-spinner clrMedium aria-label="In progress">Add Database </clr-spinner>
+                              <div class="clr-timeline-step-body">
+                                <span class="clr-timeline-step-title">Make vCenter trust KMS</span>
+                                <span class="clr-timeline-step-description">
+                             
+                            </span>
+                              </div>
+                            </li> -->
+                            <!-- <li class="clr-timeline-step">  Complete
+                              <div class="clr-timeline-step-header">Step 3</div>
+                              <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                              <div class="clr-timeline-step-body">
+                                <span class="clr-timeline-step-title">Make KMS trust vCenter</span>
+                                <span class="clr-timeline-step-description">Upload it to the KMS to complete the connection.
+                              <button class="btn btn-sm btn-link">Action</button>
+                            </span>
+                              </div>
+                            </li> -->
+                            <li class="clr-timeline-step disabled">
+                              <div class="clr-timeline-step-header">Result</div>
+                              <clr-icon shape="circle" aria-label="Not started"></clr-icon>
+                              <div class="clr-timeline-step-body">
+                                <span class="clr-timeline-step-title"></span>
+                                <span class="clr-timeline-step-description">Ready to deploy the YAML file</span>
+                              </div>
+                            </li>
+                            </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+              
+                <!-- <button type="button"*ngIf="!mainWizardOptions.editDatabase && !mainWizardOptions.addDatabase" class="btn btn-outline " (click)="reset()">Reset </button> -->
+                <!-- <button type="button" class="btn btn-outline" (click)="submitType = 'ADD'; getNextPage()">Add new database</button> -->
+                <button type="button" class="btn btn-outline "  type="submit" (click)="submitType = 'SKIP'; getNextPage()">Skip <i class="fas fa-angle-double-right"></i></button>
+                <button type="submit" class="btn btn-success "  type="submit" (click)="submitType = 'CONTINUE'" *ngIf="database.image !== 'NONE'" [disabled]="!databaseForm.form.valid">Continue<i class="fas fa-arrow-circle-right"></i></button>
+                <button type="submit" class="btn btn-success " type="submit" (click)="submitType = 'CONTINUE'; getNextPage()" *ngIf="database.image === 'NONE'" [disabled]="!databaseForm.form.valid">Continue<i class="fas fa-arrow-circle-right"></i></button>
+                <button type="submit" class="btn btn-success " *ngIf="mainWizardOptions.editDatabase " (click)="submitType = 'EDIT'"  [disabled]="!databaseForm.form.valid">Submit & Show Summary<i class="fad fa-location-arrow"></i></button>
+                <button type="button" class="btn btn-outline "  type="submit"  *ngIf="mainWizardOptions.addDatabase || mainWizardOptions.editDatabase" (click)="submitType = 'ABORT_INSERT'; getNextPage()">Abort</button>
+                <button type="submit" class="btn btn-outline "  *ngIf="mainWizardOptions.addDatabase" (click)="submitType = 'INSERT'"  [disabled]="!databaseForm.form.valid">Add</button>
+            </div>
+
+        
+        </div>
+    </div>
+</div>
+
+
+</form>
+<!-- 
+<div class="clr-row">
+
+ 
+
+
+     
+      
+</div>
+ -->
+
+
+
+    <!-- <div class="row mb-1">
         <div class="col">
             <a data-toggle="collapse" data-target=".databaseCollapse">
                 <div class="card border-dark">
@@ -49,7 +255,7 @@
         </div>
     </div>
     <!--Databases-->
-    <div class="row mb-2">
+    <!-- <div class="row mb-2">
         <div class="col">
             <div class="input-group">
                 <div class="input-group-prepend">
@@ -80,10 +286,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!--Environment Variables if exist-->
-    <div *ngIf="database.environments.length" [@enterAnimation]>
+    <!-- <div *ngIf="database.environments.length" [@enterAnimation]>
         <div class="row mb-2">
             <div class="col">
                 <p class="m-0 text-justify">The following Environment Variables can be changed to configure the database. <b>The default values are autogenerated and should be changed.</b>
@@ -103,39 +309,36 @@
                 </div>
             </div>
         </div>
-    </div>
-
+    </div> -->
+    <!-- <form (ngSubmit)="submitted = true; databaseForm.valid && getNextPage()" [@blockInitialRenderAnimation]> -->
 
     <!--Buttons-->
-    <div class="form-row mb-2" *ngIf="!mainWizardOptions.editDatabase && !mainWizardOptions.addDatabase">
+    <!-- <div class="form-row mb-2" >
+        
+            <button type="button"*ngIf="!mainWizardOptions.editDatabase && !mainWizardOptions.addDatabase" class="btn btn-danger " (click)="reset()">Reset Database</button>
+        
         <div class="col">
-            <button type="button" class="btn btn-danger btn-block" (click)="reset()">Reset Database</button>
+            <button type="button" class="btn btn-primary" (click)="submitType = 'ADD'; getNextPage()">Add another database</button>
         </div>
         <div class="col">
-            <button type="button" class="btn btn-primary btn-block" (click)="submitType = 'ADD'; getNextPage()">Add
-                another database</button>
+            <button type="button" class="btn btn-danger " (click)="submitType = 'SKIP'; getNextPage()">Skip database and continue</button>
         </div>
         <div class="col">
-            <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'SKIP'; getNextPage()">Skip
-                database and continue</button>
-        </div>
-        <div class="col">
-            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'CONTINUE'" *ngIf="database.image !== 'NONE'">Continue</button>
-            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'CONTINUE'; getNextPage()" *ngIf="database.image === 'NONE'">Continue</button>
+            <button type="submit" class="btn btn-primary " (click)="submitType = 'CONTINUE'" *ngIf="database.image !== 'NONE'">Continue</button>
+            <button type="submit" class="btn btn-primary " (click)="submitType = 'CONTINUE'; getNextPage()" *ngIf="database.image === 'NONE'">Continue</button>
         </div>
     </div>
-    <div class="row" *ngIf="mainWizardOptions.editDatabase">
-        <div class="col">
-            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'EDIT'">Submit & Show
-                Summary</button>
-        </div>
+    <div class="row" >
+        
+            <button type="submit" class="btn btn-primary "*ngIf="mainWizardOptions.editDatabase" (click)="submitType = 'EDIT'">Submit & Show Summary</button>
+        
     </div>
     <div class="form-row" *ngIf="mainWizardOptions.addDatabase">
-        <div class="col">
-            <button type="button" class="btn btn-danger btn-block" (click)="submitType = 'ABORT_INSERT'; getNextPage()">Abort</button>
-        </div>
-        <div class="col">
-            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'INSERT'">Add</button>
-        </div>
+        
+            <button type="button" class="btn btn-danger "  *ngIf="mainWizardOptions.addDatabase" (click)="submitType = 'ABORT_INSERT'; getNextPage()">Abort</button>
+        
+        
+            <button type="submit" class="btn btn-primary "  *ngIf="mainWizardOptions.addDatabase" (click)="submitType = 'INSERT'">Add</button>
+        
     </div>
-</form>
+</form> -->

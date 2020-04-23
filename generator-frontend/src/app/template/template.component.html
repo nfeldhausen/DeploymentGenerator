@@ -1,21 +1,32 @@
-<div *ngIf="!showResult">
+
+
+<div *ngIf="!showResult clr-row">
     <div *ngIf="!err">
         <div class="row mt-2 mb-2">
             <div class="col">
-                Pick a template:
+               
             </div>
         </div>
-        <div class="custom-control custom-radio mb-2" *ngFor="let name of templates">
-            <input type="radio" id="radio-{{name}}" name="customRadio" class="custom-control-input" [value]="name"
-                [(ngModel)]="currentSelected">
-            <label class="custom-control-label" for="radio-{{name}}">{{name}}</label>
+        <h2 class="center"> Pick a template</h2>
+
+        <div *ngIf="showSpinner">
+            <mat-spinner [diameter]="50" ></mat-spinner>
         </div>
-        <div class="row">
-            <div class="col">
-                <button type="button" class="btn btn-primary btn-block" (click)="send()">Send</button>
+
+        
+        <div class="container clr-row clr-col-12">
+           
+            
+            <div class="clr-col-3 card clr-offset-sm-1 clickable start" matRipple  *ngFor="let name of templates" (click)=" currentSelected=name;send();" [@enterAnimation]>
+                
+                <span> <clr-icon shape="details" size="38"></clr-icon> &nbsp; {{name}}</span>
+                
             </div>
+    
         </div>
+       
     </div>
+
     <div *ngIf="err">
         <div class="row mt-2 mb-2" style="color: red;">
             {{err}}

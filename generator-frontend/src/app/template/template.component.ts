@@ -1,11 +1,40 @@
+import { enterHeightAnimation } from './../animations/animations';
 import { Component, OnInit, Input } from '@angular/core';
 import { RequestService } from '../services/request.service';
 import { Request } from '../model/Request';
 
+import { trigger, transition, useAnimation } from '@angular/animations';
+
 @Component({
   selector: 'app-template',
   templateUrl: './template.component.html',
-  styleUrls: ['./template.component.css']
+  styleUrls: ['./template.component.css'],
+  animations: [
+    trigger(
+      'enterAnimation', [
+      transition(':enter', [
+        useAnimation(enterHeightAnimation, {
+          params: {
+            startHeight: '0',
+            endHeight: '*',
+            time: '950'
+          }
+        }
+        )
+      ]),
+      transition(':leave', [
+        useAnimation(enterHeightAnimation, {
+          params: {
+            startHeight: '*',
+            endHeight: '0',
+            time: '950'
+          }
+        }
+        )
+      ])
+    ]
+    )
+  ]
 })
 /** Class for displaying templates */
 export class TemplateComponent implements OnInit {
@@ -30,11 +59,18 @@ export class TemplateComponent implements OnInit {
   /** Error string in case fetching the templates fails */
   err: string;
 
+
+  /** To Show Spinner on the Page */
+  showSpinner : boolean;
+
   constructor(private requestService: RequestService) { }
 
   /** Start fetching the templates */
   ngOnInit() {
+    this.showSpinner = true;
     this.getTemplates();
+
+    
   }
 
   /**
@@ -57,12 +93,14 @@ export class TemplateComponent implements OnInit {
         }
       }
     );
+    this.showSpinner = false;
   }
 
   /**
    * Sends the selected template to the backend and shows the corresponding template file
    */
   send(): void {
+    console.log(this.currentSelected);
     this.requestService.getTemplate(this.currentSelected).subscribe(
       t => {
         this.deployment = t.result; 

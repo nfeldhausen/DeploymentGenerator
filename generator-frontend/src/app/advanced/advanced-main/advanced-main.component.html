@@ -1,23 +1,144 @@
-<form #f="ngForm" (ngSubmit)="submitted = true; f.form.valid && submit()" *ngIf="!showResult" [@blockInitialRenderAnimation]>
-    <ngb-alert *ngIf="submitted && !f.form.valid" type="danger" class="fixed-top container animated fadeIn"><i class="fas fa-2x fa-exclamation-triangle"></i> Not all fields are filled</ngb-alert>
-    <app-advanced-container [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-container>
-    <app-advanced-database [request]="request" [submitted]="submitted" [availableDatabases]="availableDatabases">
-    </app-advanced-database>
-    <app-advanced-service [request]="request" [submitted]="submitted" [description]="description?.services"></app-advanced-service>
-    <app-advanced-link [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-link>
 
-    <div class="form-row">
-        <div class="col" *ngIf="request.containers.length || request.databases.length">
-            <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-share-square"></i> Submit</button>
+<div class="main-container">
+
+<form #f="ngForm" (ngSubmit)="submitted = true;( f.form.valid )? submit() : openSnackBar(' Not all fields are filled', 'Close')" *ngIf="!showResult" [@blockInitialRenderAnimation]>
+   
+   
+   
+   
+   
+  
+   
+    <div class="sticly">   
+
+        
+        <div class="sticly" style="display: flex; align-items: flex-end; justify-content: flex-end;  height: 5em; " >
+
+            <div class="btn-group btn-primary btn-sm">
+                 <button class="btn btn-outline" style="width: 200px;" [disabled]="!(request.containers.length || request.databases.length || request.services.length || request.links.length)" type="button" matTooltip="Remove all elements"	(click)="reset()"> Reset &nbsp;<i class="fas fa-sync-alt" size="20" ></i>   </button>      
+                 <button class="btn btn-success" style="width: 200px;" [disabled]="!(request.containers.length || request.databases.length)" type="submit"  matTooltip="Send elements" > Submit &nbsp;<clr-icon shape="check" size="20" ></clr-icon></button>
+                  
+              </div>
+
         </div>
-        <div class="col" *ngIf="request.containers.length || request.databases.length || request.services.length || request.links.length">
-            <button type="button" class="btn btn-danger btn-block" (click)="reset()"><i class="fas fa-sync-alt"></i>
-        Reset</button>
-        </div>
-    </div>
+   
+
+    <!-- mat-stretch-tabs  -->
+    
+
+    <mat-tab-group color="primary"   animationDuration="800ms" mat-align-tabs="start" (selectedTabChange)="onLinkClick($event)"  style=" padding : 10px 0px 0px 30px; ">
+        <mat-tab >
+            <ng-template style="font-weight: bolder;" mat-tab-label >
+               
+             <span >CONTAINER</span> &nbsp; <clr-icon shape="cloud"  matBadge="{{request.containers.length}}" [matBadgeHidden]="!visibleBadgeContainer || request.containers.length== 0 "  size="20" ></clr-icon> &nbsp;
+              </ng-template>
+              <app-advanced-container [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-container> 
+              <div class="welcomeImag" *ngIf="request.containers.length==0" >
+                    <img src="../../../assets/images/containerImage.png" class="img"  height="500" width="400" />
+                                      
+              </div>
+
+
+              <div class="welcomeImag" *ngIf="request.containers.length==0" >              
+                <div>
+                    <h2>No existing element </h2>
+                </div>  
+
+              </div>
+
+              <div class="welcomeImag" *ngIf="request.containers.length==0" >
+
+                  <div>  <h3> Click on the button above to add a new Container </h3>  </div>
+
+              </div>
+        </mat-tab>
+        <mat-tab >
+            <ng-template mat-tab-label style="font-weight: bolder;">
+                
+               <span >DATABASE</span> &nbsp;
+               <clr-icon shape="storage"   matBadge="{{request.databases.length}}" [matBadgeHidden]="!visibleBadgeDatabase || request.databases.length==0"  size="20"></clr-icon> &nbsp;
+              </ng-template> 
+              <app-advanced-database [request]="request" [submitted]="submitted" [availableDatabases]="availableDatabases"> </app-advanced-database> 
+              <div class="welcomeImag" *ngIf="request.databases.length==0" >
+                <img src="../../../assets/images/databaseImage.png" class="img" height="500" width="400" />
+              </div>
+              <div class="welcomeImag" *ngIf="request.databases.length==0" >              
+                <div>
+                    <h2>No existing element </h2>
+                </div>  
+
+              </div>
+
+              <div class="welcomeImag" *ngIf="request.databases.length==0" >
+
+                  <div>  <h3> Click on the button above to add a new Database </h3>  </div>
+
+              </div>
+            </mat-tab>
+        <mat-tab >
+            <ng-template mat-tab-label style="font-weight: bolder;">
+              <span >SERVICE</span> &nbsp;
+              <clr-icon shape="container"  matBadge="{{request.services.length}}"  [matBadgeHidden]="!visibleBadgeService || request.services.length==0"  size="20"></clr-icon> &nbsp;
+
+              </ng-template>
+               <app-advanced-service [request]="request" [submitted]="submitted" [description]="description?.services"></app-advanced-service>
+               <div class="welcomeImag" *ngIf="request.services.length==0" style="background: url('containerImage.png');">
+                <img src="../../../assets/images/serviceImage.png" class="img"  height="500" width="400" />
+               </div>
+               <div class="welcomeImag" *ngIf="request.services.length==0" >              
+                <div>
+                    <h2>No existing element </h2>
+                </div>  
+
+              </div>
+
+              <div class="welcomeImag" *ngIf="request.services.length==0" >
+
+                  <div>  <h3> Click on the button above to add a new Service </h3>  </div>
+
+              </div>
+            </mat-tab>
+        <mat-tab >
+            <ng-template mat-tab-label style="font-weight: bolder;">
+                <span  >LINK</span> &nbsp;
+                <clr-icon shape="vm"  matBadge="{{request.links.length}}" size="20" [matBadgeHidden]="!visibleBadgeLink || request.links.length==0"  ></clr-icon> &nbsp;
+
+              </ng-template>
+               <app-advanced-link [request]="request" [submitted]="submitted" [description]="description?.deployments"></app-advanced-link> 
+               <div class="welcomeImag" *ngIf="request.links.length==0" >
+                <img src="../../../assets/images/linkImage.png"  height="500" class="img" width="400" />
+               </div>
+               <div class="welcomeImag" *ngIf="request.links.length==0" >              
+                <div>
+                    <h2>No existing element </h2>
+                </div>  
+
+              </div>
+
+              <div class="welcomeImag" *ngIf="request.links.length==0" >
+
+                  <div>  <h3> Click on the button above to add a new Link </h3>  </div>
+
+              </div>
+            </mat-tab>
+            
+
+
+      </mat-tab-group>
+      
+      
+    
+    
+    </div> 
+    
+
+
+    
 </form>
-<div class="row" *ngIf="showResult">
-    <div class="col">
+
+</div>
+<div *ngIf="showResult">
+    <div>
         <app-result [deployment]="deployment" [request]="request"></app-result>
     </div>
 </div>

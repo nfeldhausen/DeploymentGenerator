@@ -7,7 +7,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ErrorModalComponent } from '../../error-modal/error-modal.component';
 import { trigger, transition, useAnimation } from '@angular/animations';
 import { enterHeightAnimation } from 'src/app/animations/animations';
-
+import { MatTabChangeEvent, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-advanced-main',
@@ -71,7 +71,19 @@ export class AdvancedMainComponent implements OnInit {
   /** Navigation subscription to evaluate calls from result mode */
   navigationSubscription;
 
-  constructor(private requestService: RequestService, private router: Router, private modalService: NgbModal) { 
+  /* to display the badge on the icon when the container is active*/
+  visibleBadgeContainer: boolean = true;
+
+    /* to display the badge on the icon when the container is active*/
+  visibleBadgeDatabase: boolean = false;
+
+      /* to display the badge on the icon when the container is active*/
+  visibleBadgeService: boolean = false;
+
+    /* to display the badge on the icon when the container is active*/
+   visibleBadgeLink: boolean = false;
+
+  constructor(private requestService: RequestService,public snackBar: MatSnackBar, private router: Router, private modalService: NgbModal) { 
     this.navigationSubscription = this.router.events.subscribe((e: any) => {
       if (e instanceof NavigationEnd) {
         this.goBack();
@@ -170,4 +182,55 @@ export class AdvancedMainComponent implements OnInit {
       modalRef.componentInstance.message = error['statusText'];
     }
   }
+  
+
+// ...
+
+onLinkClick(event: MatTabChangeEvent) {
+
+
+    switch(event.index)
+    {
+      case 0: 
+        this.visibleBadgeContainer = true; 
+        this.visibleBadgeDatabase = false; 
+        this.visibleBadgeService = false; 
+        this.visibleBadgeLink = false;
+      break; 
+
+      
+      case 1: 
+        this.visibleBadgeContainer = false; 
+        this.visibleBadgeDatabase = true; 
+        this.visibleBadgeService = false; 
+        this.visibleBadgeLink = false;
+      break;
+
+      
+      case 2: 
+        this.visibleBadgeContainer = false; 
+        this.visibleBadgeDatabase = false; 
+        this.visibleBadgeService = true; 
+        this.visibleBadgeLink = false;
+      break;
+
+      
+      case 3: 
+        this.visibleBadgeContainer = false; 
+        this.visibleBadgeDatabase = false; 
+        this.visibleBadgeService = false; 
+        this.visibleBadgeLink = true;
+
+      break;
+    }
+
+
 }
+openSnackBar(message: string, action: string) 
+{
+  this.snackBar.open(message, action, {
+     duration: 2000,
+  });
+}
+}
+

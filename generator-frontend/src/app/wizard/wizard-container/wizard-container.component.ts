@@ -103,6 +103,8 @@ export class WizardContainerComponent implements OnInit {
   /** Image Query for debouncing the image analysis */
   imageQuery: Subject<any> = new Subject<any>();
 
+
+  xlOpen: boolean = true; 
   constructor(private requestService: RequestService, private spinner: NgxSpinnerService) { }
 
   /**

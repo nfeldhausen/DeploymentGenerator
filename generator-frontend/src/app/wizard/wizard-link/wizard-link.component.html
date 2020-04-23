@@ -1,3 +1,183 @@
+<form #linkForm="ngForm" clrForm (ngSubmit)="submitted = true; linkForm.valid && getNextPage()">
+
+
+<div class="card">
+
+    <div class="card-header">
+        <h2> NEW Link  <img src="../../../assets/images/Illustration5.png" height="60" width="50"></h2>
+    </div>
+
+    <div class="card-block clr-row">
+
+       
+        <div class="card-text clr-col-8">
+            
+            <div>
+
+                    <div class="card-title">
+                        <h3>Link information !</h3>
+                    </div>
+                    <p> 
+                        One or multiple containers may have to communicate with each other. Here you can define links between containers (e.g. for the communication with other containers) in form of environment variables. By default this creates
+                        a environment variable in form $LinkName=toContainerName in the fromContainer. If you need a custom environment variable (for example a link with the port) you can set the link scheme field. Just write what you want
+                        and if you want to access the toContainer insert the keyword &lt;link&gt; (e.g. http://&lt;link&gt;:8080)
+                    </p>
+                    <p>
+                        To create a link add an empty link, insert the name of the environment
+                        variable for the
+                        communication, and select where the link should be created (fromContainer) and
+                        where
+                        the link should go
+                        to
+                        (toContainer)
+                    </p>
+                    <br>
+            </div>
+            <div>
+            </div>
+        
+                <div *ngFor="let link of request.links" [@fastEnterAnimation]>
+
+
+                    <clr-input-container>
+                        <label>Name</label>
+                        <input clrInput type="text" placeholder="Variable Name" [(ngModel)]="link.name" name="{{link.uniqueName}}-name" required #name="ngModel" [ngClass]="{'is-invalid': submitted && name.invalid}">            
+                        <clr-control-error>This field is required!</clr-control-error>
+                      </clr-input-container>
+
+                      <clr-input-container>
+                        <label>Scheme</label>
+                        <input type="text" clrInput  placeholder="&lt;link&gt;" [(ngModel)]="link.scheme" name="{{link.uniqueName}}-scheme" #scheme="ngModel" [ngClass]="{'is-invalid': submitted && scheme.invalid}">                    
+                        <clr-control-error>This field is required!</clr-control-error>
+                      </clr-input-container>
+
+                      <clr-select-container>
+                        <label>containerFrom</label>
+                        <select clrSelect [(ngModel)]="link.containerFrom" name="{{link.uniqueName}}-containerFrom" required #containerFrom="ngModel" [ngClass]="{'is-invalid': submitted && containerFrom.invalid}">
+                            <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                                {{container.name}}</option>
+                        </select>
+                        <clr-control-error>This field is required!</clr-control-error>
+                      </clr-select-container>
+
+                      <clr-select-container>
+                        <label>containerTo</label>
+                        <select clrSelect [(ngModel)]="link.containerTo" name="{{link.uniqueName}}-containerTo" required #containerTo="ngModel" [ngClass]="{'is-invalid': submitted && containerTo.invalid}">
+                            <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                                {{container.name}}</option>
+                        </select>
+                        <clr-control-error>This field is required!</clr-control-error>
+                      </clr-select-container>
+                      <br>
+                    
+                      <div>
+                        <button type="button" class="btn btn-danger-outline" (click)="deleteLink(link)"> <clr-icon shape="trash"></clr-icon> &nbsp;Remove </button>
+                      </div>
+
+
+                </div>
+               
+          
+        </div>
+
+        <div class="clr-col">
+
+            <ul class="clr-timeline  clr-timeline-vertical">
+            
+                <li class="clr-timeline-step">  
+                    <div class="clr-timeline-step-header">Welcome</div>
+                    <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title">Information </span>
+                        <span class="clr-timeline-step-description">Read the information carefully <br> and click on the start button</span>
+                      </div>
+                  </li>
+                <li class="clr-timeline-step">
+                  <div class="clr-timeline-step-header">Step 1</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title"> Container </span>
+                    <span class="clr-timeline-step-description">
+                        A modal dialog will open <br>  Read the information and fill in the corresponding fields
+                  <br>
+                    <div class="btn-group btn-sm">
+                    <button class="btn btn-sm ">Add </button>
+                    <button class="btn btn-sm ">Edit</button>
+                    </div>
+                </span>
+                  </div>
+                </li>
+                <li class="clr-timeline-step">
+                    <div class="clr-timeline-step-header">Step 2</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                      <span class="clr-timeline-step-title"> Database </span>
+                      <span class="clr-timeline-step-description">
+                        Read the information and fill in the corresponding fields
+                     <br>
+                    <div class="btn-group btn-sm">
+                    <button class="btn btn-sm "  (click)="submitType = 'ADD'; getNextPage()">Add </button>
+                    <button class="btn btn-sm ">Edit</button>
+                    </div>
+                  </span>
+                    </div>
+                  </li>
+                  <li class="clr-timeline-step disabled">
+                    <div class="clr-timeline-step-header">Step 3</div>
+                    <clr-icon shape="dot-circle" aria-current="true" aria-label="Current"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                      <span class="clr-timeline-step-title"> Link </span>
+                      <span class="clr-timeline-step-description">
+                        Read the information and fill in the corresponding fields 
+                  </span>
+                    </div>
+                  </li>
+                <!-- <li class="clr-timeline-step">    Progress
+                  <div class="clr-timeline-step-header">Step 2</div>
+                  <clr-spinner clrMedium aria-label="In progress">Add Database </clr-spinner>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title">Make vCenter trust KMS</span>
+                    <span class="clr-timeline-step-description">
+                 
+                </span>
+                  </div>
+                </li> -->
+                <!-- <li class="clr-timeline-step">  Complete
+                  <div class="clr-timeline-step-header">Step 3</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title">Make KMS trust vCenter</span>
+                    <span class="clr-timeline-step-description">Upload it to the KMS to complete the connection.
+                  <button class="btn btn-sm btn-link">Action</button>
+                </span>
+                  </div>
+                </li> -->
+                <li class="clr-timeline-step disabled">
+                  <div class="clr-timeline-step-header">Result</div>
+                  <clr-icon shape="circle" aria-label="Not started"></clr-icon>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title"></span>
+                    <span class="clr-timeline-step-description">Ready to deploy the YAML file</span>
+                  </div>
+                </li>
+                </ul>
+        </div>
+
+    </div>
+    <div class="card-footer">
+      
+        <button type="button" class="btn btn-outline" (click)="addLink()"> <clr-icon shape="plus-circle"></clr-icon> &nbsp; Add Link</button>
+        <button type="submit" class="btn btn-success" [disabled]="!linkForm.form.valid">Continue <i class="fas fa-arrow-circle-right"></i></button>
+    </div>
+</div>
+</form>
+
+
+
+
+<!-- 
+
+
 <div class="row mb-1">
     <div class="col">
         <a data-toggle="collapse" data-target=".linkCollapse">
@@ -14,9 +194,11 @@
                                 <i class="fas fa-info-circle fa-3x my-auto"></i>
                             </div>
                             <div class="col">
-                                <p class="card-text text-justify">One or multiple containers may have to communicate with each other. Here you can define links between containers (e.g. for the communication with other containers) in form of environment variables. By default this creates
+                                <p class="card-text text-justify">
+                                    One or multiple containers may have to communicate with each other. Here you can define links between containers (e.g. for the communication with other containers) in form of environment variables. By default this creates
                                     a environment variable in form $LinkName=toContainerName in the fromContainer. If you need a custom environment variable (for example a link with the port) you can set the link scheme field. Just write what you want
-                                    and if you want to access the toContainer insert the keyword &lt;link&gt; (e.g. http://&lt;link&gt;:8080)</p>
+                                    and if you want to access the toContainer insert the keyword &lt;link&gt; (e.g. http://&lt;link&gt;:8080)
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -42,7 +224,7 @@
     </div>
 </div>
 
-<!--Actual Links-->
+
 <form #linkForm="ngForm" (ngSubmit)="submitted = true; linkForm.valid && getNextPage()">
     <div class="form-row mb-2" *ngFor="let link of request.links" [@fastEnterAnimation]>
         <div class="col">
@@ -102,4 +284,4 @@
             <button type="submit" class="btn btn-primary btn-block">Continue</button>
         </div>
     </div>
-</form>
+</form> -->

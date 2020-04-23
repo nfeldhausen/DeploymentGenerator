@@ -1,9 +1,176 @@
+
+<form clrForm #editLinkForm="ngForm" (ngSubmit)="submitted = true; editLinkForm.valid && getNextPage()">
+
+
+    <div class="card">
+
+        <div class="card-header">
+            <h2> <span *ngIf="mainWizardOptions.addLink">NEW </span><span *ngIf="!mainWizardOptions.addLink">EDIT </span>LINK  <img src="../../../assets/images/Illustration5.png" height="60" width="50"></h2>
+        </div>
+    
+
+        <div class="card-block clr-row">
+
+
+            <div class="card-text clr-col-8">
+
+                <clr-alert [clrAlertClosable]="false">
+                    <clr-alert-item>
+                        <span class="alert-text">
+                            On this page it is possible to edit an existing link or to create a new link
+                        </span>
+                    </clr-alert-item>
+                </clr-alert>
+
+                <clr-input-container>
+                    <label>Name</label>
+                    <input clrInput type="text" placeholder="Variable Name" [(ngModel)]="link.name" name="{{link.uniqueName}}-name" required #name="ngModel" [ngClass]="{'is-invalid': submitted && name.invalid}">            
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-input-container>
+    
+                <clr-input-container>
+                    <label>Scheme</label>
+                    <input type="text" clrInput  placeholder="&lt;link&gt;" [(ngModel)]="link.scheme" name="{{link.uniqueName}}-scheme" #scheme="ngModel" [ngClass]="{'is-invalid': submitted && scheme.invalid}">                    
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-input-container>
+    
+                <clr-select-container>
+                    <label>containerFrom</label>
+                    <select clrSelect [(ngModel)]="link.containerFrom" name="{{link.uniqueName}}-containerFrom" required #containerFrom="ngModel" [ngClass]="{'is-invalid': submitted && containerFrom.invalid}">
+                        <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                            {{container.name}}</option>
+                    </select>
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-select-container>
+    
+                <clr-select-container>
+                    <label>containerTo</label>
+                    <select clrSelect [(ngModel)]="link.containerTo" name="{{link.uniqueName}}-containerTo" required #containerTo="ngModel" [ngClass]="{'is-invalid': submitted && containerTo.invalid}">
+                        <option *ngFor="let container of getAllContainer()" [value]="container.uniqueName">
+                            {{container.name}}</option>
+                    </select>
+                    <clr-control-error>This field is required!</clr-control-error>
+                </clr-select-container>
+    
+
+            </div>
+            <div class="clr-col">
+
+                <ul class="clr-timeline  clr-timeline-vertical">
+                
+                    <li class="clr-timeline-step">  
+                        <div class="clr-timeline-step-header">Welcome</div>
+                        <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                        <div class="clr-timeline-step-body">
+                            <span class="clr-timeline-step-title">Information </span>
+                            <span class="clr-timeline-step-description">Read the information carefully <br> and click on the start button</span>
+                          </div>
+                      </li>
+                    <li class="clr-timeline-step">
+                      <div class="clr-timeline-step-header">Step 1</div>
+                      <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                      <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title"> Container </span>
+                        <span class="clr-timeline-step-description">
+                            A modal dialog will open <br>  Read the information and fill in the corresponding fields
+                      <br>
+                        <div class="btn-group btn-sm">
+                        <button class="btn btn-sm ">Add </button>
+                        <button class="btn btn-sm ">Edit</button>
+                        </div>
+                    </span>
+                      </div>
+                    </li>
+                    <li class="clr-timeline-step">
+                        <div class="clr-timeline-step-header">Step 2</div>
+                      <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                        <div class="clr-timeline-step-body">
+                          <span class="clr-timeline-step-title"> Database </span>
+                          <span class="clr-timeline-step-description">
+                            Read the information and fill in the corresponding fields
+                         <br>
+                        <div class="btn-group btn-sm">
+                        <button class="btn btn-sm "  (click)="submitType = 'ADD'; getNextPage()">Add </button>
+                        <button class="btn btn-sm ">Edit</button>
+                        </div>
+                      </span>
+                        </div>
+                      </li>
+                      <li class="clr-timeline-step disabled">
+                        <div class="clr-timeline-step-header">Step 3</div>
+                      <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+
+                        <div class="clr-timeline-step-body">
+                          <span class="clr-timeline-step-title"> Link </span>
+                          <span class="clr-timeline-step-description">
+                            Read the information and fill in the corresponding fields 
+                      </span>
+                        </div>
+                      </li>
+                    <!-- <li class="clr-timeline-step">    Progress
+                      <div class="clr-timeline-step-header">Step 2</div>
+                      <clr-spinner clrMedium aria-label="In progress">Add Database </clr-spinner>
+                      <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title">Make vCenter trust KMS</span>
+                        <span class="clr-timeline-step-description">
+                     
+                    </span>
+                      </div>
+                    </li> -->
+                    <!-- <li class="clr-timeline-step">  Complete
+                      <div class="clr-timeline-step-header">Step 3</div>
+                      <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                      <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title">Make KMS trust vCenter</span>
+                        <span class="clr-timeline-step-description">Upload it to the KMS to complete the connection.
+                      <button class="btn btn-sm btn-link">Action</button>
+                    </span>
+                      </div>
+                    </li> -->
+                    <li class="clr-timeline-step disabled">
+                      <div class="clr-timeline-step-header">Result</div>
+                      <clr-icon shape="circle" aria-label="Not started"></clr-icon>
+                      <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title"></span>
+                        <span class="clr-timeline-step-description">Ready to deploy the YAML file</span>
+                      </div>
+                    </li>
+                    </ul>
+            </div>
+
+
+
+        </div>
+
+        <div class="card-footer">
+            
+            <button type="button"  *ngIf="mainWizardOptions.addLink" class="btn btn-danger " (click)="submitType = 'ABORT_INSERT'; getNextPage()" >Abort</button>
+            <button type="submit"  *ngIf="!mainWizardOptions.addLink" class="btn btn-primary" (click)="submitType = 'ADD'" [disabled]="!editLinkForm.form.valid">Submit & Show Summary</button>
+            <button type="submit"  *ngIf="mainWizardOptions.addLink" class="btn btn-primary " (click)="submitType = 'INSERT'" [disabled]="!editLinkForm.form.valid">Add</button>
+
+        </div>
+           
+
+    </div>
+
+
+</form>
+
+
+
+
+<!-- 
+
+
+
+
+
 <div class="row">
     <div class="col">
         <p class="m-0">On this page it is possible to edit an existing link or to create a new link</p>
     </div>
 </div>
-<form #editLinkForm="ngForm" (ngSubmit)="submitted = true; editLinkForm.valid && getNextPage()">
+<form  (ngSubmit)="submitted = true; editLinkForm.valid && getNextPage()">
     <div class="form-row mb-2">
         <div class="col">
             <div class="input-group">
@@ -55,7 +222,7 @@
     </div>
     <div class="row" *ngIf="!mainWizardOptions.addLink">
         <div class="col">
-            <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'ADD'">Submit & Show Summary</button>
+            <button type="submit" *ngIf="!mainWizardOptions.addLink" class="btn btn-primary btn-block" (click)="submitType = 'ADD'">Submit & Show Summary</button>
         </div>
     </div>
     <div class="form-row" *ngIf="mainWizardOptions.addLink">
@@ -66,4 +233,4 @@
             <button type="submit" class="btn btn-primary btn-block" (click)="submitType = 'INSERT'">Add</button>
         </div>
     </div>
-</form>
+</form> -->

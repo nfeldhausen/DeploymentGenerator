@@ -1,90 +1,188 @@
-<div class="row mb-1">
-    <div class="col">
-        <a data-toggle="collapse" data-target=".resultCollapse">
-            <div class="card border-dark">
-                <div class="resultCollapse collapse">
-                    <div class="card-header">
-                        <i class="fas fa-info-circle my-auto mr-1"></i> Result Information
-                    </div>
+
+
+
+<div class="card">
+
+    <div class="card-header">
+        <h2>Result <img src="../../../assets/images/Illustration5.png" height="60" width="50"></h2>
+    </div>
+
+    <div class="card-block clr-row">
+
+     
+        <div class="card-text clr-col-8">
+            
+            <div>
+             
+                <div class="card-title">
+                    <h3>Result information !</h3>
                 </div>
-                <div class="resultCollapse collapse show">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-auto my-auto">
-                                <i class="fas fa-info-circle fa-3x my-auto"></i>
-                            </div>
-                            <div class="col">
-                                <p class="card-text text-justify">This list lists all containers/databases/links you
-                                    created. To
-                                    modify an existing
-                                    container/database/link just click the names. If you want to delete a single
-                                    container/database/link click
-                                    the Trash Icon next to it. If you want to add something click the add Button and
-                                    select
-                                    what
-                                    you want to
-                                    add. To add a link you have to add a container or database first!</p>
-                            </div>
+                <p> 
+                    This list lists all containers/databases/links you
+                    created. To
+                    modify an existing
+                    container/database/link just click the names. If you want to delete a single
+                    container/database/link click
+                    the Trash Icon next to it. If you want to add something click the add Button and
+                    select
+                    what
+                    you want to
+                    add. To add a link you have to add a container or database first!
+                </p>
+                <br>
+    
+            </div>
+
+            <div class="clr-row">
+                <!-- Container -->
+                <div style="margin: 5px;" *ngFor="let container of request.containers" class="btn-group btn-primary clr-col-12" [@fastEnterAnimation]>
+                   
+                        <button type="button" class="btn  btn-outline btn-block" (click)="editContainer(container)" matTooltip="Click to edit this Container">  <clr-icon shape="pencil"></clr-icon>&nbsp;Edit Container
+                            {{container.name}}</button>
+ 
+                        <button type="button" class="btn btn-danger" matTooltip="Click to remove this Container" (click)="deleteContainer(container)"> <clr-icon shape="trash"></clr-icon></button>
+                 <br>
+
+                </div>
+             
+                <!-- Databases -->
+                <div style="margin: 5px;"  *ngFor="let database of request.databases" class="btn-group btn-primary  clr-col-12" [@fastEnterAnimation]>
+                    
+                        <button type="button" class="btn  btn-outline btn-block" matTooltip="Click to edit this Database" (click)="editDatabase(database)"> <clr-icon shape="pencil"></clr-icon>&nbsp;Edit Database
+                            {{database.name}}</button>
+                    
+                    
+                        <button type="button" class="btn btn-danger" matTooltip="Click to remove this Database" (click)="deleteDatabase(database)"><clr-icon shape="trash"></clr-icon></button>
+                            <br>
+                </div>
+              
+
+                <div style="margin: 5px;" class="btn-group btn-primary  clr-col-12" *ngFor="let link of request.links" [@fastEnterAnimation]>
+                    <button type="button" class="btn btn-outline btn-block" matTooltip="Click to edit this Link"
+                    (click)="editLink(link)"> <clr-icon shape="pencil"></clr-icon>&nbsp;Edit Link {{link.name}}</button>
+
+                    <button type="button" class="btn btn-danger"  matTooltip="Click to remove this Link" (click)="deleteLink(link)"><clr-icon shape="trash"></clr-icon></button>
+                    <br>
+                </div>
+            </div>
+           
+        
+              
+               
+          
+        </div>
+        <div class="clr-col">
+
+            <ul class="clr-timeline  clr-timeline-vertical ">
+            
+                <li class="clr-timeline-step">  
+                    <div class="clr-timeline-step-header">Welcome</div>
+                    <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                        <span class="clr-timeline-step-title">Information </span>
+                        <span class="clr-timeline-step-description">Read the information carefully <br> and click on the start button</span>
+                      </div>
+                  </li>
+                <li class="clr-timeline-step">
+                  <div class="clr-timeline-step-header">Step 1</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title"> Container </span>
+                    <span class="clr-timeline-step-description">
+                        A modal dialog will open <br>  Read the information and fill in the corresponding fields
+                  <br>
+                    <div class="btn-group btn-sm">
+                    <button class="btn btn-sm " (click)="addContainer()">Add </button>
+                    <button class="btn btn-sm disabled">Edit</button>
+                    </div>
+                </span>
+                  </div>
+                </li>
+                <li class="clr-timeline-step">
+                    <div class="clr-timeline-step-header">Step 2</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                      <span class="clr-timeline-step-title"> Database </span>
+                      <span class="clr-timeline-step-description">
+                        Read the information and fill in the corresponding fields
+                     <br>
+                    <div class="btn-group btn-sm">
+                    <button class="btn btn-sm "  (click)="addDatabase()">Add </button>
+                    <button class="btn btn-sm disabled">Edit</button>
+                    </div>
+                  </span>
+                    </div>
+                  </li>
+                  <li class="clr-timeline-step disabled">
+                    <div class="clr-timeline-step-header">Step 3</div>
+                    <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                    <div class="clr-timeline-step-body">
+                      <span class="clr-timeline-step-title"> Link </span>
+                      <span class="clr-timeline-step-description">
+                        Read the information and fill in the corresponding fields 
+                        <br>
+                        <div class="btn-group btn-sm">
+                        <button class="btn btn-sm "  *ngIf="request.containers.length !== 0 || request.databases.length !== 0"  (click)="addLink()">Add </button>
+                        <button class="btn btn-sm disabled">Edit</button>
                         </div>
+                  </span>
                     </div>
-                </div>
-            </div>
-        </a>
+                  </li>
+                <!-- <li class="clr-timeline-step">    Progress
+                  <div class="clr-timeline-step-header">Step 2</div>
+                  <clr-spinner clrMedium aria-label="In progress">Add Database </clr-spinner>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title">Make vCenter trust KMS</span>
+                    <span class="clr-timeline-step-description">
+                 
+                </span>
+                  </div>
+                </li> -->
+                <!-- <li class="clr-timeline-step">  Complete
+                  <div class="clr-timeline-step-header">Step 3</div>
+                  <clr-icon shape="success-standard" aria-label="Completed"></clr-icon>
+                  <div class="clr-timeline-step-body">
+                    <span class="clr-timeline-step-title">Make KMS trust vCenter</span>
+                    <span class="clr-timeline-step-description">Upload it to the KMS to complete the connection.
+                  <button class="btn btn-sm btn-link">Action</button>
+                </span>
+                  </div>
+                </li> -->
+                
+                <li class="clr-timeline-step">    
+                    <div class="clr-timeline-step-header">Result</div>
+                    <clr-spinner clrMedium aria-label="In progress"> </clr-spinner>
+                    <div class="clr-timeline-step-body">
+                      <span class="clr-timeline-step-title">Completed</span>
+                      <span class="clr-timeline-step-description">Ready to deploy the YAML file</span>
+                    </div>
+                </li>
+                </ul>
+        </div>
+
+    </div>
+    <div class="card-footer">
+        
+        <clr-dropdown >
+            <button clrDropdownTrigger class="dropdown-toggle btn btn-primary" matTooltip="Click Add new Container, Database or Link">
+                <clr-icon shape="plus-circle"></clr-icon>&nbsp; Add
+                <clr-icon shape="caret down"></clr-icon>
+            </button>
+            <clr-dropdown-menu *clrIfOpen>
+                <label class="dropdown-header" aria-hidden="true">New Item</label>
+                <div aria-label="Dropdown header Action 1" clrDropdownItem  (click)="addContainer()">Container</div>
+                <div aria-label="Dropdown header Action 2"  clrDropdownItem (click)="addDatabase()">Database</div>
+                
+                <div clrDropdownItem  (click)="addLink()" *ngIf="request.containers.length !== 0 || request.databases.length !== 0">Link </div>
+            
+            </clr-dropdown-menu>
+        </clr-dropdown>
+        &nbsp;
+        <button type="button" class="btn btn-success " (click)="submit()"
+        [disabled]="request.containers.length === 0 && request.databases.length === 0"
+        ngbTooltip="Nothing to submit - Add a container or database first"
+        [disableTooltip]="request.containers.length !== 0 || request.databases.length !== 0"> <clr-icon shape="check"></clr-icon>&nbsp;Submit</button>
     </div>
 </div>
-<div class="row mb-2">
-    <div class="col">
-        <div ngbDropdown class="d-block">
-            <button class="btn btn-primary btn-block" id="dropdownBasic1" ngbDropdownToggle>Add</button>
-            <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="w-100">
-                <button ngbDropdownItem (click)="addContainer()">Container</button>
-                <button ngbDropdownItem (click)="addDatabase()">Database</button>
-                <button ngbDropdownItem (click)="addLink()"
-                    *ngIf="request.containers.length !== 0 || request.databases.length !== 0">Link</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div [@blockInitialRenderAnimation]>
-    <!--Containers-->
-    <div class="form-row mb-2" *ngFor="let container of request.containers" [@fastEnterAnimation]>
-        <div class="col">
-            <button type="button" class="btn btn-success btn-block" (click)="editContainer(container)">Edit Container
-                {{container.name}}</button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-secondary" (click)="deleteContainer(container)"><i
-                    class="fas fa-trash-alt" title="Delete"></i></button>
-        </div>
-    </div>
-    <!--Databases-->
-    <div class="form-row mb-2" *ngFor="let database of request.databases" [@fastEnterAnimation]>
-        <div class="col">
-            <button type="button" class="btn btn-warning btn-block" (click)="editDatabase(database)">Edit Database
-                {{database.name}}</button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-secondary" (click)="deleteDatabase(database)"><i
-                    class="fas fa-trash-alt" title="Delete"></i></button>
-        </div>
-    </div>
-    <!--Links-->
-    <div class="form-row mb-2" *ngFor="let link of request.links" [@fastEnterAnimation]>
-        <div class="col">
-            <button type="button" class="btn btn-info btn-block"
-                (click)="editLink(link)">{{getLinkDescription(link)}}</button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-secondary" (click)="deleteLink(link)"><i class="fas fa-trash-alt"
-                    title="Delete"></i></button>
-        </div>
-    </div>
-    <div class="row mb-2">
-        <div class="col">
-            <button type="button" class="btn btn-primary btn-block" (click)="submit()"
-                [disabled]="request.containers.length === 0 && request.databases.length === 0"
-                ngbTooltip="Nothing to submit - Add a container or database first"
-                [disableTooltip]="request.containers.length !== 0 || request.databases.length !== 0">Submit</button>
-        </div>
-    </div>
-</div>
+
+

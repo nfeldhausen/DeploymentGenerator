@@ -1,0 +1,71 @@
+.center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  padding : 5px;
+  word-wrap: break-word;
+  text-align: center;
+  text-decoration: none;
+}
+.vertNavBar{
+  background: #011e38 ; 
+  width: 75px;
+   color : #e4e4e4; 
+
+}
+
+.navElt{
+  text-decoration: none;
+  color: white;
+  font-weight: 300;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.navElt:hover
+{
+  color: #e4e4e4 ;
+  background: transparent;
+  opacity: 0.2s;
+  font-weight: 700;
+  transition: 1s;
+}
+.navElt:focus
+{
+  color: #e4e4e4 ;
+  background: transparent;
+  opacity: 0.2s;
+  border-right: 6px solid #0275d8 ;
+  
+  font-weight: 500;
+}
+
+.active
+{
+  color: #e4e4e4 ;
+  background: transparent;
+  opacity: 0.2s;
+  border-right: 6px solid #0275d8 ;
+  font-weight: 500;
+}
+.rightTop
+{
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+mat-slider
+{
+   width: 250px;
+}
+
+.title{
+  font-size: Comic Sans MS, Comic Sans, cursive;
+  text-transform: capitalize;
+}
+.content-area{
+
+}

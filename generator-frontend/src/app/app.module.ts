@@ -1,8 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core'
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -30,6 +30,9 @@ import { NgxSpinnerModule } from "ngx-spinner";
 import { WizardStepperContainerComponent } from './wizard/wizard-stepper-container/wizard-stepper-container.component';
 import { ArchwizardModule } from 'angular-archwizard';
 import { WizardStepperMainComponent } from './wizard/wizard-stepper-main/wizard-stepper-main';
+import { ClarityModule } from '@clr/angular';
+import {MatBadgeModule} from '@angular/material/badge'; 
+import { MatSliderModule, MatButtonModule,MatTooltipModule, MatRadioModule,MatSnackBarModule, MatRippleModule, MatCheckbox, MatCheckboxModule, MatCardModule, MatFormFieldModule, MatIconModule, MatProgressSpinnerModule, MatSortModule, MatPaginatorModule, MatTableModule, MatInputModule, MatDialogModule, MatTabGroup, MatTabsModule, MatListModule, MatDividerModule, MatListItem, MatGridListModule, MatBottomSheetModule } from '@angular/material';
 
 @NgModule({
   entryComponents: [
@@ -44,6 +47,7 @@ import { WizardStepperMainComponent } from './wizard/wizard-stepper-main/wizard-
     AdvancedDatabaseComponent,
     AdvancedServiceComponent,
     AdvancedLinkComponent,
+    
     WelcomeComponent,
     TemplateComponent,
     ResultComponent,
@@ -57,7 +61,11 @@ import { WizardStepperMainComponent } from './wizard/wizard-stepper-main/wizard-
     WizardEditLinkComponent,
     NullDefaultValueDirective,
     WizardStepperContainerComponent,
-    WizardStepperMainComponent
+    WizardStepperMainComponent,
+    
+    
+    
+    
   ],
   imports: [
     BrowserModule,
@@ -67,8 +75,41 @@ import { WizardStepperMainComponent } from './wizard/wizard-stepper-main/wizard-
     NgbModule,
     BrowserAnimationsModule,
     NgxSpinnerModule,
-    ArchwizardModule
+    ArchwizardModule,
+    ClarityModule,
+    MatSliderModule,
+    MatButtonModule,
+    MatBottomSheetModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatButtonModule,
+    MatRadioModule,
+    MatCheckboxModule,
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatRippleModule,
+    MatBadgeModule,
+    
+   
+    MatInputModule,
+    MatListModule,
+    MatDividerModule,
+    MatGridListModule,
+    MatTableModule,
+    MatTabsModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatProgressSpinnerModule,
+    MatIconModule,
+    MatButtonModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatDialogModule
+    
   ],
+  exports: [MatSliderModule, BrowserAnimationsModule],
   providers: [],
   bootstrap: [AppComponent]
 })
